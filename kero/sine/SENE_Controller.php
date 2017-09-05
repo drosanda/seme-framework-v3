@@ -377,20 +377,24 @@ abstract class SENE_Controller{
 			$this->view($this->theme.'/'.$comp.'/'.$el,$__forward);
 		}
 	}
-	protected function load($item,$type="model"){
+	protected function load($item,$malias="",$type="model"){
 		if($type=="model"){
-			if(file_exists(SENEMODEL.$item.'.php')){
-				require_once SENEMODEL.$item.'.php';
-				$this->$item = new $item();
+			$mfile = SENEMODEL.$item.'.php';
+			if(empty($malias)) $malias = basename($mfile,'.php');
+			if(file_exists($mfile)){
+				require_once $mfile;
+				$this->$malias = new $malias();
 			}else{
-				die('could not find '.$item.' model on '.SENEMODEL);
+				die('could not find '.$mfile.' model on '.SENEMODEL);
 			}
 		}elseif($type=="lib"){
-			if(file_exists(SENELIB.$item.'.php')){
-				require_once SENELIB.$item.'.php';
-				$this->$item = new $item();
+			$mfile = SENELIB.$item.'.php';
+			if(empty($malias)) $malias = basename($mfile,'.php');
+			if(file_exists($mfile)){
+				require_once $mfile;
+				$this->$malias = new $malias();
 			}else{
-				die('could not find '.$item.' library on '.SENELIB);
+				die('could not find '.$mfile.' library on '.SENELIB);
 			}
 		}else{
 			if(file_exists(SENELIB.$item.'.php')){
@@ -519,9 +523,13 @@ abstract class SENE_Controller{
 	}
 }
 class SENE_Loader{
-	public function model($item){
-		require_once(MODEL_PATH.$item.'.php');
-			return new $item();
+	public function model($item,$alias=""){
+		$mfile = MODEL_PATH.$item.'.php';
+		if(empty($alias)) $nfile = basename($mfile);
+		if(file_exists($fmodels)){
+			require_once($fmodels);
+			return new $nfile();
+		}
 	}
 }
 class SENE_Input{
