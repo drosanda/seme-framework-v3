@@ -20,7 +20,7 @@ abstract class SENE_Controller{
 	var $additional = array();
 	var $additionalBefore = array();
 	var $additionalAfter = array();
-	var $theme = 'frontend/base/';
+	var $theme = 'front/';
 	var $js_footer = array();
 	var $js_ready = "";
 	var $__content = ""; //loads by view
@@ -211,7 +211,8 @@ abstract class SENE_Controller{
 	public function getContentLanguage(){
 		return $this->content_language;
 	}
-	public function setTheme($theme="frontend/base/default/"){
+	public function setTheme($theme="front/"){
+		$theme = rtrim($theme,"/")."/";
 		$this->theme = $theme;
 		$this->additional = $this->getThemeConfig();
 		$this->js_footer = $this->getJsFooterBasic();
@@ -352,12 +353,16 @@ abstract class SENE_Controller{
 		}
 	}
 	public function getJsFooter(){
-		foreach($this->js_footer as $key=>$a){
-			if(is_string($a)){
-				$a = str_replace ("{{base_url}}", base_url(), $a);
-				$a = str_replace ("{{base_url_admin}}", base_url_admin(), $a);
-				echo "\n\t".$a;
+		if(is_array($this->js_footer)){
+			foreach($this->js_footer as $key=>$a){
+				if(is_string($a)){
+					$a = str_replace ("{{base_url}}", base_url(), $a);
+					$a = str_replace ("{{base_url_admin}}", base_url_admin(), $a);
+					echo "\n\t".$a;
+				}
 			}
+		}else{
+			trigger_error('Error: file json-nya ada yang salah. Silakan cek lagi file app/view/front/script.json');
 		}
 	}
 	public function getContentType(){

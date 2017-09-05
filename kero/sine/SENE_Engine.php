@@ -422,3 +422,32 @@ function get_caller_info() {
 	$c .= ($func != '') ? $func . "(): " : "";
 	return($c);
 }
+
+function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_context){
+	echo '<div style="padding: 10px; background-color: #ededed;">';
+	echo '<h2 style="color: #ef0000;">Error</h2>';
+	echo '<p>File: '.$error_file.'</p>';
+	echo '<p>Line: '.$error_line.'</p>';
+	echo "<p><b>Error:</b> [$errno] $errstr<br></p>";
+	echo '</div>';
+	echo '<div style="padding: 20px; border: 1px #dddddd solid; font-size: smaller;">';
+	echo "<h3>Backtrace</h3>";
+	echo '</div>';
+	echo '<div style="padding: 20px; border: 1px #dddddd solid; font-size: smaller;">';
+	$i=0;
+	foreach(debug_backtrace() as $e){
+		$i++;
+		if($i<=2) continue;
+		if(!isset($e['file'])) continue;
+		echo '<p><b>File</b>: '.$e['file'].'</p>';
+		echo '<p><b>Line</b>: '.$e['line'].'</p>';
+		if(isset($e['class'])) echo '<p><b>Class</b>: '.$e['class'].'</p>';
+		if(isset($e['method'])) echo '<p><b>Method</b>: '.$e['method'].'</p>';
+		echo '<p><b>Function</b>: '.$e['function'].'</p>';
+		echo '<hr>';
+	}
+	echo '</div>';
+  echo "<hr><p><small>Seme Framework Error Handler</small></p>";
+  die();
+}
+set_error_handler("seme_error_handling");
