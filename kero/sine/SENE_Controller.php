@@ -186,18 +186,8 @@ abstract class SENE_Controller{
 			return $x;
 		}
 	}
-	public function putJsFooter($stype,$ucomponent="vendor",$is_custom=0){
-		if(!empty($stype)){
-			if($is_custom){
-				if($is_custom==2){
-					$this->js_footer[] = '<script src="'.$stype.'.js"></script>';
-				}else{
-					$this->js_footer[] = '<script src="'.base_url().$ucomponent.'/'.$stype.'.js"></script>';
-				}
-			}else{
-				$this->js_footer[] = '<script src="'.base_url().'assets/js/'.$ucomponent.'/'.$stype.'.js"></script>';
-			}
-		}
+	public function putJsFooter($stype){
+		$this->js_footer[] = '<script src="'.$stype.'.js"></script>';
 	}
 	public function setCanonical($l=""){
 		$this->canonical = $l;
