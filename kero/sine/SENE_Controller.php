@@ -375,10 +375,11 @@ abstract class SENE_Controller{
 	protected function load($item,$malias="",$type="model"){
 		if($type=="model"){
 			$mfile = SENEMODEL.$item.'.php';
+			$cname = basename($mfile,'.php');
 			if(empty($malias)) $malias = basename($mfile,'.php');
 			if(file_exists($mfile)){
 				require_once $mfile;
-				$this->$malias = new $malias();
+				$this->$malias = new $cname();
 			}else{
 				die('could not find '.$mfile.' model on '.SENEMODEL);
 			}
