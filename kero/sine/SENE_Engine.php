@@ -8,6 +8,11 @@ class SENE_Engine{
 	public function __construct(){
 		require_once SENEKEROSINE."/SENE_Controller.php";
 		require_once SENEKEROSINE."/SENE_Model.php";
+		
+		if(isset($GLOBALS['core_prefix'])) if(!empty($GLOBALS['core_prefix'])) $this->core_prefix = $GLOBALS['core_prefix'];
+		if($GLOBALS['core_controller']) if(!empty($GLOBALS['core_controller'])) $this->core_controller = $GLOBALS['core_controller'];
+		if($GLOBALS['core_model']) if(!empty($GLOBALS['core_model'])) $this->core_model = $GLOBALS['core_model'];
+		
 		$this->admin_url=ADMIN_URL;
 		self::$__instance = $this;
 	}
@@ -15,6 +20,30 @@ class SENE_Engine{
     return self::$_instance;
   }
 	public function SENE_Engine(){
+		$core_controller_file = SENECORE.$this->core_prefix.$this->core_controller.'.php';
+		$core_model_file = SENECORE.$this->core_prefix.$this->core_model.'.php';
+		
+		if(!empty($this->core_controller) && !empty($this->core_prefix)){
+			if(file_exists($core_controller_file)){
+				require_once($core_controller_file);
+			}else{
+				$error_msg = 'unable to load core controller on '.$core_controller_file;
+				$core_controller_file = SENECORE.$this->core_prefix.$this->core_controller.'.php';
+				error_log($error_msg);
+				trigger_error($error_msg);
+			}
+		}
+		if(!empty($this->core_model) && !empty($this->core_prefix)){
+			if(file_exists($core_model_file)){
+				require_once($core_model_file);
+			}else{
+				$error_msg = 'unable to load core model on '.$core_controller_file;
+				$core_controller_file = SENECORE.$this->core_prefix.$this->core_controller.'.php';
+				error_log($error_msg);
+				trigger_error($error_msg);
+			}
+		}
+		
 		$this->newRouteFolder();
 	}
 	private function defaultController(){

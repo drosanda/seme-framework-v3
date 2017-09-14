@@ -17,6 +17,7 @@ $config_dir='app/config';
 $model_dir='app/model';
 $view_dir='app/view';
 $controller_dir='app/controller';
+$core_dir='app/core';
 
 
 if (defined('STDIN')){
@@ -52,6 +53,9 @@ if (realpath($view_dir) !== FALSE){
 if (realpath($controller_dir) !== FALSE){
 	$controller_dir = realpath($controller_dir).'/';
 }
+if (realpath($core_dir) !== FALSE){
+	$core_dir = realpath($core_dir).'/';
+}
 if(!is_dir($apps_dir)){
 	die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
@@ -81,6 +85,9 @@ if(!is_dir($model_dir)){
 if(!is_dir($controller_dir)){
 	die("missing controller dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
+if(!is_dir($core_dir)){
+	die("missing core dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
 
 $apps_dir = rtrim($apps_dir, '/').'/';
 $ssys_dir = rtrim($ssys_dir, '/').'/';
@@ -91,6 +98,7 @@ $config_dir = rtrim($config_dir, '/').'/';
 $model_dir = rtrim($model_dir, '/').'/';
 $view_dir = rtrim($view_dir, '/').'/';
 $controller_dir = rtrim($controller_dir, '/').'/';
+$core_dir = rtrim($core_dir, '/').'/';
 
 if(!is_dir($apps_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
 if(!is_dir($ssys_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
@@ -101,6 +109,7 @@ if(!is_dir($config_dir)) die("Seme framework directory missing : ".pathinfo(__FI
 if(!is_dir($model_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
 if(!is_dir($view_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
 if(!is_dir($controller_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($core_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
 
 define('SENEROOT',str_replace("\\", "/", realpath("").'/'));
 define('SENEAPP',str_replace("\\", "/",$apps_dir));
@@ -113,6 +122,7 @@ define('SENECFG',$config_dir);
 define('SENEMODEL',$model_dir);
 define('SENEVIEW',$view_dir);
 define('SENECONTROLLER',$controller_dir);
+define('SENECORE',$core_dir);
 
 if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
 require_once(SENECFG."/config.php");
@@ -128,6 +138,9 @@ require_once(SENECFG."/database.php");
 
 if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
 require_once(SENECFG."/session.php");
+
+if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
+require_once(SENECFG."/core.php");
 
 if(!isset($default_controller,$notfound_controller)){
 	$default_controller="welcome";
