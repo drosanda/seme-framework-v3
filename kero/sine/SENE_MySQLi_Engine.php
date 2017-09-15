@@ -331,6 +331,26 @@ class SENE_MySQLi_Engine{
 						$val = "".$v."";
 						$val = $this->esc($val);
 						break;
+					case ">=":
+						$c= ">=";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
+					case "<=":
+						$c= "<=";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
+					case ">":
+						$c= ">";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
+					case "<":
+						$c= "<";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
 					default:
 						$c = "=";
 						$val = $this->esc($v);
@@ -443,6 +463,26 @@ class SENE_MySQLi_Engine{
 					$val = "".$v."";
 					$val = $this->esc($val);
 					break;
+				case ">=":
+					$c= ">=";
+					$val = "".$v."";
+					$val = $this->esc($val);
+					break;
+				case "<=":
+					$c= "<=";
+					$val = "".$v."";
+					$val = $this->esc($val);
+					break;
+				case ">":
+					$c= ">";
+					$val = "".$v."";
+					$val = $this->esc($val);
+					break;
+				case "<":
+					$c= "<";
+					$val = "".$v."";
+					$val = $this->esc($val);
+					break;
 				default:
 					if($v=="IS NULL" || $v=="is null"){
 						$c = "";
@@ -535,6 +575,26 @@ class SENE_MySQLi_Engine{
 						break;
 					case "<>":
 						$c= "<>";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
+					case ">=":
+						$c= ">=";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
+					case "<=":
+						$c= "<=";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
+					case ">":
+						$c= ">";
+						$val = "".$v."";
+						$val = $this->esc($val);
+						break;
+					case "<":
+						$c= "<";
 						$val = "".$v."";
 						$val = $this->esc($val);
 						break;
@@ -1193,9 +1253,10 @@ class SENE_MySQLi_Engine{
 		$this->flushQuery();
 		return $res;
 	}
-	public function where_in($tbl_key,$values,$is_not=0,$after="AND"){
+	public function where_in($tbl_key,$values,$is_not="0",$after="AND"){
 		$not = '';
-		if($is_not=="NOR" || $is_not==1) $not = "NOT";
+		
+		if($is_not == '1' || $is_not == 1) $not = 'NOT';
 		
 		$this->in_where .= ' '.$tbl_key.' '.$not.' IN (';
 		foreach($values as $v){
@@ -1203,6 +1264,7 @@ class SENE_MySQLi_Engine{
 		}
 		$this->in_where = rtrim($this->in_where,", ");
 		$this->in_where .= ') '.$after.' ';
+		
 		return $this;
 	}
 }
