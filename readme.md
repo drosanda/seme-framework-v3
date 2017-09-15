@@ -126,6 +126,8 @@ Seme Framework allowing you to create template or layout that consist of separat
 
 ```
 
+## More Guides
+Look for more guides in https://www.nyingspot.com/author/seme_framework/ (Bahasa).
 
 ## License
 Seme Framework licensed under MIT License 2.0
