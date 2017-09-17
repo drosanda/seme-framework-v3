@@ -239,31 +239,32 @@ abstract class SENE_Controller{
 		$this->additional[$key] = $val;
 	}
 	public function setAdditionalBefore($val){
-		$i=0;
-		end($this->additionalBefore); // move the internal pointer to the end of the array
-		$key = key($this->additionalBefore);
-		if(!empty($key)) $i=$key;
+		if(!is_array($this->additionalBefore)) $this->additionalBefore = array();
 		if(is_array($val)){
 			foreach($val as $v){
-				$this->additionalBefore[$i] = $v;
+				$this->additionalBefore[] = $v;
 				$i++;
 			}
 		}elseif(is_string($val)){
-			$this->additionalBefore[$key] = $val;
+			$this->additionalBefore[] = $val;
 		}
 	}
 	public function setAdditionalAfter($val){
-		$i=0;
-		end($this->additionalBefore); // move the internal pointer to the end of the array
-		$key = key($this->additionalBefore);
-		if(!empty($key)) $i=$key;
+		if(!is_array($this->additionalAfter)) $this->additionalAfter = array();
 		if(is_array($val)){
 			foreach($val as $v){
-				$this->additionalAfter[$i] = $v;
+				$this->additionalAfter[] = $v;
 				$i++;
 			}
 		}elseif(is_string($val)){
-			$this->additionalAfter[$key] = $val;
+			$this->additionalAfter[] = $val;
+		}
+	}
+	public function loadCss($css_url,$utype="after"){
+		if(strtolower($utype)=="after"){
+			$this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'" />');
+		}else{
+			$this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'" />');
 		}
 	}
 	public function redirToHttps(){		
