@@ -53,6 +53,7 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
+			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -77,6 +78,7 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
+			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -96,13 +98,14 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
+			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
 			unset($_SESSION[$keytemp]);
 			ob_start();
 			require_once($v.".php");
-			$this->__themeLeftContent = ob_get_contents();
+			$this->__themeLeftContent .= ob_get_contents();
 			ob_end_clean();
 			return 0;
 		}else{
@@ -114,6 +117,7 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
+			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -147,6 +151,7 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
+			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -444,6 +449,7 @@ abstract class SENE_Controller{
 	protected function view($v,$__forward=array()){
 		if(file_exists(SENEVIEW.$v.".php")){
 			$keytemp=md5(date("h:i:s"));
+			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
