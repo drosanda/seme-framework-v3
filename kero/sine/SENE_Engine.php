@@ -85,6 +85,22 @@ class SENE_Engine{
 			}
 		}
 	}
+	private function ovrRoutes($paths=array()){
+		$path = strtolower(implode('/', $paths));
+		$path = trim($path,'/');
+		$target = '';
+		$routes = $this->routes;
+		foreach($routes as $key=>$val){
+			$key = strtolower(trim($key,"/"));
+			$val = strtolower(trim($val,"/"));
+			$key = str_replace(array(':any', ':num'), array('[^/]+', '[0-9]+'), $key);
+			if(preg_match('#^'.$key.'$#', $path, $matches)){
+				$target = '/'.preg_replace('#^'.$key.'$#', $val, $path);
+			}
+		}
+		if(!empty($target)) return explode("/",$target);
+		return $paths;
+	}
 	private function newRouteFolder(){
 		$found=0;
 		$sene_method = $GLOBALS['sene_method'];
@@ -103,6 +119,7 @@ class SENE_Engine{
 				$i++;
 			}
 			unset($p);
+			$path = $this->ovrRoutes($path);
 			$path[1] = str_replace('-','_',$path[1]);
 			if((!empty($path[1]))){
 				if($path[1] == "admin" && $this->admin_url !="admin"){
