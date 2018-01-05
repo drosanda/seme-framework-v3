@@ -522,7 +522,39 @@ abstract class SENE_Controller{
 		echo '</pre>';
 	}
 	public function render($cacheable=0){
-		echo $this->__content;
+		$cacheable = (int) $cacheable;
+		if($cacheable){
+			$cache_filename = md5($_SERVER['REQUEST_URI']);
+			$cache_file = SENECACHE.'/'.$cache_filename;
+			if (file_exists($cache_file) && (filemtime($cache_file) > (time() - 60 * $cacheable ))) {
+				echo file_get_contents($cache_file);
+			}else{
+				
+				$search = array(
+					'/\>[^\S ]+/s',     // strip whitespaces after tags, except space
+					'/[^\S ]+\</s',     // strip whitespaces before tags, except space
+					'/(\s)+/s',         // shorten multiple whitespace sequences
+					'/<!--(.|\s)*?-->/' // Remove HTML comments
+				);
+
+				$replace = array(
+					'>',
+					'<',
+					'\\1',
+					''
+				);
+				$pattern = '/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\')\/\/.*))/';
+				$buffer = preg_replace($pattern, '', $this->__content);
+
+				$buffer = preg_replace($search, $replace, $buffer);
+				file_put_contents($cache_file, $buffer, LOCK_EX);
+				echo $this->__content;
+			}
+			// At this point $cache is either the retrieved cache or a fresh copy, so echo it
+			
+		}else{
+			echo $this->__content;
+		}
 	}
 }
 class SENE_Loader{
