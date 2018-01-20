@@ -12,7 +12,7 @@ abstract class SENE_Controller{
 	var $posttitle = 'SEME Framework';
 	var $robots = 'INDEX,FOLLOW';
 	var $description = 'Created By Seme Framework. The light weight framework that fit your needs with automation generated model.';
-	var $keywords = 'lightweight, framework, php, api, generator';
+	var $keyword = 'lightweight, framework, php, api, generator';
 	var $author = 'SEME Framework';
 	var $icon = 'favicon.png';
 	var $shortcut_icon = 'favicon.png';
@@ -28,6 +28,8 @@ abstract class SENE_Controller{
 	var $__themeRightContent = ""; //use by putRightThemeContent
 	var $__themeLeftContent = ""; //use by putLeftThemeContent
 	var $__themeRightMenu = ""; //use by putLeftThemeContent
+  var $__bodyBefore = "";
+
 	function __construct() {
 		$this->input = new SENE_Input();
 		$this->additional = $this->getThemeConfig();
@@ -45,7 +47,7 @@ abstract class SENE_Controller{
 		}
 		$this->view($this->getTheme()."page/".$u,$data);
 	}
-	public function resetThemeContent(){	
+	public function resetThemeContent(){
 		$this->__themeContent = '';
 	}
 	public function putThemeContent($tc="",$__forward=array()){
@@ -53,7 +55,6 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
-			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -64,7 +65,9 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			die("unable to putThemeContent ".$v.".php");
+			trigger_error("unable to putThemeContent ".$v.".php");
+			die();
+			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	public function getRightMenuTitle(){
@@ -78,7 +81,6 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
-			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -89,7 +91,9 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			die("unable to putThemeContent ".$v.".php");
+			trigger_error("unable to putThemeContent ".$v.".php");
+			die();
+			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	//sidemenuleft
@@ -98,7 +102,6 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
-			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -109,7 +112,9 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			die("unable to putThemeContent ".$v.".php");
+			trigger_error("unable to putThemeContent ".$v.".php");
+			die();
+			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	public function putJsReady($tc="",$__forward=array()){
@@ -117,7 +122,6 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
-			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -128,7 +132,9 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			die("unable to putThemeContent ".$v.".php");
+			trigger_error("unable to putThemeContent ".$v.".php");
+			die();
+			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	public function getThemeContent(){
@@ -151,19 +157,42 @@ abstract class SENE_Controller{
 		//die($v);
 		if(file_exists($v.".php")){
 			$keytemp=md5(date("h:i:s"));
-			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
 			unset($_SESSION[$keytemp]);
 			ob_start();
 			require_once($v.".php");
-			$this->__jsContent = ob_get_contents();
+			$this->__jsContent .= ob_get_contents();
 			ob_end_clean();
 			return 0;
 		}else{
-			die("unable to putThemeContent ".$v.".php");
+			trigger_error("unable to putThemeContent ".$v.".php");
+			die();
+			//die("unable to putThemeContent ".$v.".php");
 		}
+	}
+	public function putBodyBefore($tc="",$__forward=array()){
+		$v = SENEVIEW.$this->theme.'/'.$tc;
+		//die($v);
+		if(file_exists($v.".php")){
+			$keytemp=md5(date("h:i:s"));
+			$_SESSION[$keytemp] = $__forward;
+			//print_r($_SESSION);
+			extract($_SESSION[$keytemp]);
+			unset($_SESSION[$keytemp]);
+			ob_start();
+			require_once($v.".php");
+			$this->__bodyBefore .= ob_get_contents();
+			ob_end_clean();
+			return 0;
+		}else{
+			trigger_error("unable to putThemeContent ".$v.".php");
+			die();
+		}
+	}
+	public function getBodyBefore(){
+		echo $this->__bodyBefore;
 	}
 	public function getJsContent(){
 		echo $this->__jsContent;
@@ -191,8 +220,13 @@ abstract class SENE_Controller{
 			return $x;
 		}
 	}
-	public function putJsFooter($stype){
-		$this->js_footer[] = '<script src="'.$stype.'.js"></script>';
+	public function putJsFooter($stype,$is_external=0){
+		if($is_external){
+			$this->js_footer[] = '<script src="'.$stype.'"></script>';
+		}else{
+			$stype = rtrim($stype,'.js');
+			$this->js_footer[] = '<script src="'.$stype.'.js"></script>';
+		}
 	}
 	public function setCanonical($l=""){
 		$this->canonical = $l;
@@ -206,8 +240,8 @@ abstract class SENE_Controller{
 	public function getContentLanguage(){
 		return $this->content_language;
 	}
-	public function setTheme($theme="front/"){
-		$theme = rtrim($theme,"/")."/";
+	public function setTheme($theme="front"){
+		$theme = rtrim($theme,'/').'/';
 		$this->theme = $theme;
 		$this->additional = $this->getThemeConfig();
 		$this->js_footer = $this->getJsFooterBasic();
@@ -221,8 +255,8 @@ abstract class SENE_Controller{
 	public function setDescription($description="en"){
 		$this->description = $description;
 	}
-	public function setKeyword($keywords="lightweight,framework,php,api,generator"){
-		$this->keywords = $keywords;
+	public function setKeyword($keyword="lightweight,framework,php,api,generator"){
+		$this->keyword = $keyword;
 	}
 	public function setRobots($robots="INDEX,FOLLOW"){
 		if($robots != "INDEX,FOLLOW") $robots='NOINDEX,NOFOLLOW';
@@ -267,12 +301,18 @@ abstract class SENE_Controller{
 	}
 	public function loadCss($css_url,$utype="after"){
 		if(strtolower($utype)=="after"){
-			$this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'" />');
+			$this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'.css" />');
 		}else{
-			$this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'" />');
+			$this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'.css" />');
 		}
 	}
-	public function redirToHttps(){		
+	public function putCssAfter($css_url,$utype="after"){
+		$this->setAdditionalAfter('<link rel="stylesheet" href="'.$css_url.'.css" />');
+	}
+	public function putCssBefore($css_url){
+		$this->setAdditionalBefore('<link rel="stylesheet" href="'.$css_url.'.css" />');
+	}
+	public function redirToHttps(){
 		if(isset($_SERVER['HTTP_HOST'])){
 			if($_SERVER['HTTP_HOST']!="localhost"){
 				if(isset($_SERVER['HTTP_X_FORWARDED_PROTO'])){
@@ -290,11 +330,11 @@ abstract class SENE_Controller{
 			}
 		}
 	}
-	
+
 	public function removeAdditional($key){
 		unset($this->additional[$key]);
 	}
-	
+
 	public function getLang(){
 		return $this->lang;
 	}
@@ -307,8 +347,8 @@ abstract class SENE_Controller{
 	public function getDescription(){
 		return $this->description;
 	}
-	public function getKeywords(){
-		return $this->keywords;
+	public function getKeyword(){
+		return $this->keyword;
 	}
 	public function getRobots(){
 		return $this->robots;
@@ -349,16 +389,12 @@ abstract class SENE_Controller{
 		}
 	}
 	public function getJsFooter(){
-		if(is_array($this->js_footer)){
-			foreach($this->js_footer as $key=>$a){
-				if(is_string($a)){
-					$a = str_replace ("{{base_url}}", base_url(), $a);
-					$a = str_replace ("{{base_url_admin}}", base_url_admin(), $a);
-					echo "\n\t".$a;
-				}
+		foreach($this->js_footer as $key=>$a){
+			if(is_string($a)){
+				$a = str_replace ("{{base_url}}", base_url(), $a);
+				$a = str_replace ("{{base_url_admin}}", base_url_admin(), $a);
+				echo "\n\t".$a;
 			}
-		}else{
-			trigger_error('Error: file json-nya ada yang salah. Silakan cek lagi file app/view/front/script.json');
 		}
 	}
 	public function getContentType(){
@@ -367,9 +403,9 @@ abstract class SENE_Controller{
 	public function getTheme(){
 		return $this->theme;
 	}
-	public function getThemeElement($el="",$comp='page/html',$__forward=array(),$cacheable=0){
+	public function getThemeElement($el="",$__forward=array(),$cacheable=0){
 		if(!empty($el)){
-			$this->view($this->theme.'/'.$comp.'/'.$el,$__forward);
+			$this->view($this->theme.'/'.$el,$__forward);
 			$this->render($cacheable);
 		}
 	}
@@ -382,16 +418,19 @@ abstract class SENE_Controller{
 		if($type=="model"){
 			$mfile = SENEMODEL.$item.'.php';
 			$cname = basename($mfile,'.php');
-			if(empty($malias)) $malias = basename($mfile,'.php');
+			if(empty($malias)) $malias = $cname;
+			$malias = strtolower($malias);
 			if(file_exists($mfile)){
 				require_once $mfile;
-				$this->$malias = new $cname();
+				$this->{$malias} = new $cname();
 			}else{
-				die('could not find '.$mfile.' model on '.SENEMODEL);
+				trigger_error('could not find '.$mfile.' model on '.SENEMODEL);
+				//die();
 			}
 		}elseif($type=="lib"){
 			$mfile = SENELIB.$item.'.php';
-			if(empty($malias)) $malias = basename($mfile,'.php');
+			if(empty($malias)) $malias = $cname;
+			$malias = strtolower($malias);
 			if(file_exists($mfile)){
 				require_once $mfile;
 				$this->$malias = new $malias();
@@ -431,7 +470,7 @@ abstract class SENE_Controller{
     return self::$_instance;
   }
 	public abstract function index();
-	
+
 	protected function wrapper($data){
 		return array("result"=>$data);
 	}
@@ -449,7 +488,6 @@ abstract class SENE_Controller{
 	protected function view($v,$__forward=array()){
 		if(file_exists(SENEVIEW.$v.".php")){
 			$keytemp=md5(date("h:i:s"));
-			if(!isset($_SESSION[$keytemp])) $_SESSION[$keytemp] = array();
 			$_SESSION[$keytemp] = $__forward;
 			//print_r($_SESSION);
 			extract($_SESSION[$keytemp]);
@@ -463,19 +501,24 @@ abstract class SENE_Controller{
 			die("unable to load view ".SENEVIEW.$v.".php");
 		}
 	}
-	protected function lib($data,$type="lib"){
+	protected function lib($data,$lalias="",$type="lib"){
+
 		if($type=='lib'){
 			$lpath = str_replace("\\","/",SENELIB.$data.".php");
 			if(file_exists(strtolower($lpath))){
 				require_once(strtolower($lpath));
-				$method = new $data();
-				//$this->$data=$data;
-				$this->{$data} = $method;
+				$cname = basename($lpath,'.php');
+				$method = new $cname();
+				if(empty($lalias)) $lalias = $cname;
+				$lalias = strtolower($lalias);
+				$this->{$lalias} = $method;
 			}else if(file_exists($lpath)){
 				require_once($lpath);
-				$method = new $data();
-				//$this->$data=$data;
-				$this->{$data} = $method;
+				$cname = basename($lpath,'.php');
+				$method = new $cname();
+				if(empty($lalias)) $lalias = $cname;
+				$lalias = strtolower($lalias);
+				$this->{$lalias} = $method;
 			}else{
 				die("unable to load library on ".$lpath);
 			}
@@ -522,21 +565,20 @@ abstract class SENE_Controller{
 		echo '</pre>';
 	}
 	public function render($cacheable=0){
-		$cacheable = (int) $cacheable;
+    $cacheable = (int) $cacheable;
 		if($cacheable){
 			$cache_filename = md5($_SERVER['REQUEST_URI']);
 			$cache_file = SENECACHE.'/'.$cache_filename;
 			if (file_exists($cache_file) && (filemtime($cache_file) > (time() - 60 * $cacheable ))) {
 				echo file_get_contents($cache_file);
 			}else{
-				
+
 				$search = array(
 					'/\>[^\S ]+/s',     // strip whitespaces after tags, except space
 					'/[^\S ]+\</s',     // strip whitespaces before tags, except space
 					'/(\s)+/s',         // shorten multiple whitespace sequences
 					'/<!--(.|\s)*?-->/' // Remove HTML comments
 				);
-
 				$replace = array(
 					'>',
 					'<',
@@ -545,13 +587,12 @@ abstract class SENE_Controller{
 				);
 				$pattern = '/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\')\/\/.*))/';
 				$buffer = preg_replace($pattern, '', $this->__content);
-
 				$buffer = preg_replace($search, $replace, $buffer);
 				file_put_contents($cache_file, $buffer, LOCK_EX);
 				echo $this->__content;
 			}
 			// At this point $cache is either the retrieved cache or a fresh copy, so echo it
-			
+
 		}else{
 			echo $this->__content;
 		}
@@ -591,5 +632,12 @@ class SENE_Input{
 	}
 	public function debug(){
 		return array("post_param"=>$_POST,"get_param"=>$_GET,"file_param"=>$_FILES);
+	}
+	public function request($var){
+		if(isset($_REQUEST[$var])){
+			return $_REQUEST[$var];
+		}else{
+			return 0;
+		}
 	}
 }

@@ -1,13 +1,11 @@
 <?php
 Class Conumtext {
 	private $key='';
-	//private $alpha='YUGieAND1d43ngaWCBLhMubcfjklmopqrstvwxyz2567890EFHIJKOPQRSTVXZ';
-	//private $alpha='6yug13andir0z4m89cefhjklopqstuvwx27b5';
 	private $alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 	private $beta='';
 	private $charlie;
 	private $str;
-	
+
 	public function __construct($key=""){
 		$this->key=$key;
 	}
@@ -22,7 +20,7 @@ Class Conumtext {
 		$this->init();
 		echo strlen($this->alpha)."<br />";
 		echo count($this->beta)."<br />";
-		
+
 	}
 	public function encode($num){
 		$b = strlen($this->alpha);
@@ -46,22 +44,23 @@ Class Conumtext {
 		}
 		return $res;
 	}
-	public function genRand($type="int",$min=1){
+	public function genRand($type="int",$min=1,$max=9){
 		$str = '';
 		if($type=="int"){
 			$min=0;
-			$max=9;
+			if(empty($max)) $max=9;
 			for($i=0;$i<=$min;$i++){
 				$x = rand($min,($max-1));
 				$str .= $x;
 			}
 		}else{
 			$alpha = $this->alpha;
-			$max = strlen($alpha);
+			if(empty($max)) $max = strlen($alpha);
+
 			for($i=0;$i<=$min;$i++){
 				$x = rand(0,($max-1));
 				$str .= $alpha{$x};
-			}		
+			}
 		}
 		return $str;
 	}

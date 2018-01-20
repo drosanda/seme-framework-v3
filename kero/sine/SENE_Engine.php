@@ -1,20 +1,36 @@
 <?php
 class SENE_Engine{
   protected static $__instance;
-	
+
 	var $admin_url="";
 	var $notfound=NOTFOUND_CONTROLLER;
 	var $default=DEFAULT_CONTROLLER;
+	var $core_prefix = 'SM_';
+	var $core_controller = '';
+	var $core_model = '';
+	var $routes;
 	public function __construct(){
 		require_once SENEKEROSINE."/SENE_Controller.php";
 		require_once SENEKEROSINE."/SENE_Model.php";
-		
+
 		if(isset($GLOBALS['core_prefix'])) if(!empty($GLOBALS['core_prefix'])) $this->core_prefix = $GLOBALS['core_prefix'];
 		if($GLOBALS['core_controller']) if(!empty($GLOBALS['core_controller'])) $this->core_controller = $GLOBALS['core_controller'];
 		if($GLOBALS['core_model']) if(!empty($GLOBALS['core_model'])) $this->core_model = $GLOBALS['core_model'];
-		
+
+
 		$this->admin_url=ADMIN_URL;
 		self::$__instance = $this;
+
+		if(!isset($GLOBALS['routes'])) $GLOBALS['routes'] = array();
+		$routes = $GLOBALS['routes'];
+		$rs = array();
+		foreach($routes as $key=>$val){
+			$key = trim($key,"/");
+			$val = trim($val,"/");
+			$rs[$key] = $val;
+		}
+		$this->routes = $rs;
+
 	}
   public static function getInstance(){
     return self::$_instance;
@@ -22,7 +38,7 @@ class SENE_Engine{
 	public function SENE_Engine(){
 		$core_controller_file = SENECORE.$this->core_prefix.$this->core_controller.'.php';
 		$core_model_file = SENECORE.$this->core_prefix.$this->core_model.'.php';
-		
+
 		if(!empty($this->core_controller) && !empty($this->core_prefix)){
 			if(file_exists($core_controller_file)){
 				require_once($core_controller_file);
@@ -43,12 +59,13 @@ class SENE_Engine{
 				trigger_error($error_msg);
 			}
 		}
-		
+
 		$this->newRouteFolder();
+		//$this->newRouteFolder2();
 	}
 	private function defaultController(){
 		$cname = $this->default."";
-		include SENECONTROLLER.$this->default.".php";
+		require_once SENECONTROLLER.$this->default.".php";
 		$cname = new $cname();
 		$cname->index();
 	}
@@ -127,28 +144,75 @@ class SENE_Engine{
 					$this->notFound($newpath);
 					die();
 				}
-					
-				if($this->admin_url==$path[1]){ 
+
+				if($this->admin_url==$path[1]){
 					$path[1]="admin";
 				}else{
 					$this->globalHandlerCMSPage($path);
 				}
-				
+
 				$newpath = realpath(SENECONTROLLER.$path[1]);
-				
+
 				if(is_dir($newpath)){
 					$newpath = rtrim($newpath,'/');
 					$newpath = $newpath.'/';
 					if(empty($path[2])) $path[2] = 'home';
+					$dirn = $newpath.'/'.$path[2];
 					$filename = realpath($newpath.''.$path[2].".php");
 					//var_dump($filename);
-					if(is_file($filename)){
+					if(is_dir($dirn)){
+						$dirn = rtrim($dirn,'/');
+						$dirn = $dirn.'/';
+						if(!isset($path[3])) $path[3] = '';
+						if(empty($path[3])) $path[3] = 'home';
+						$filename = realpath($dirn.''.$path[3].".php");
+						if(is_file($filename)){
+							require_once $filename;
+							$cname = basename($filename, ".php");
+							$cname = str_replace('-','_',$cname);
+							if (!class_exists($cname, false)) {
+								trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
+								die();
+							}
+							$cname = new $cname();
+							$func = "index";
+							if(isset($path[4])){
+								if(empty($path[4])){
+									$func = "index";
+								}else{
+									$func = $path[4];
+								}
+							}
+							$func = str_replace('-','_',$func);
+							if(method_exists($cname,$func)){
+								$reflection = new ReflectionMethod($cname, $func);
+								if (!$reflection->isPublic()){
+									$this->notFound();
+								}
+								$args=array();
+								$num = $reflection->getNumberOfParameters();
+								if($num>0){
+									for($j=0;$j<$num;$j++){
+										if(isset($path[(5+$j)])){
+											$args[]=$path[(5+$j)];
+										}else{
+											$args[]=NULL;
+										}
+									}
+								}
+								$reflection->invokeArgs($cname,$args);
+							}else{
+								$this->notFound($newpath);
+							}
+						}else{
+							$this->notFound($newpath);
+						}
+					}else	if(is_file($filename)){
 						require_once $filename;
 						$cname = basename($filename, ".php");
 						$cname = str_replace('-','_',$cname);
 						if (!class_exists($cname, false)) {
-							trigger_error("Unable to load class: $cname", E_USER_WARNING);
-							trigger_error("Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
+							trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
 							die();
 						}
 						$cname = new $cname();
@@ -220,7 +284,7 @@ class SENE_Engine{
 								}
 								$reflection->invokeArgs($cname,$args);
 							}else{
-								
+
 								$this->notFound();
 							}
 						}else{
@@ -238,6 +302,357 @@ class SENE_Engine{
 			$this->defaultController();
 		}
 	}
+	private function newRouteFolder2(){
+		$found=0;
+		$sene_method = $GLOBALS['sene_method'];
+		if(isset($_SERVER[$sene_method])){
+			$path=$_SERVER[$sene_method];
+			$path=explode("/",$path);
+			$i=0;
+			foreach($path as $p){
+				if(!empty($p)){
+					$pos = strpos($p, '?');
+					if ($pos !== false) {
+						//echo "pos: ".$pos;
+						unset($path[$i]);
+					}
+				}
+				$i++;
+			}
+			unset($p);
+			$path[1] = str_replace('-','_',$path[1]);
+			if((!empty($path[1]))){
+				if($path[1] == "admin" && $this->admin_url !="admin"){
+					$newpath = realpath(SENECONTROLLER.$path[1]);
+					$this->notFound($newpath);
+					die();
+				}
+
+				if($this->admin_url==$path[1]){
+					$path[1]="admin";
+				}else{
+					$this->globalHandlerCMSPage($path);
+				}
+
+				$newpath = realpath(SENECONTROLLER.$path[1]);
+
+				if(is_dir($newpath)){
+					$newpath = rtrim($newpath,'/');
+					$newpath = $newpath.'/';
+					if(empty($path[2])) $path[2] = 'home';
+					$dirn = $newpath.'/'.$path[2];
+					$filename = realpath($newpath.''.$path[2].".php");
+					//var_dump($filename);
+					if(is_dir($dirn)){
+						$dirn = rtrim($dirn,'/');
+						$dirn = $dirn.'/';
+						if(!isset($path[3])) $path[3] = '';
+						if(empty($path[3])) $path[3] = 'home';
+						$filename = realpath($dirn.''.$path[3].".php");
+						if(is_file($filename)){
+							require_once $filename;
+							$cname = basename($filename, ".php");
+							$cname = str_replace('-','_',$cname);
+							if (!class_exists($cname, false)) {
+								trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
+								die();
+							}
+							$cname = new $cname();
+							$func = "index";
+							if(isset($path[4])){
+								if(empty($path[4])){
+									$func = "index";
+								}else{
+									$func = $path[4];
+								}
+							}
+							$func = str_replace('-','_',$func);
+							if(method_exists($cname,$func)){
+								$reflection = new ReflectionMethod($cname, $func);
+								if (!$reflection->isPublic()){
+									$this->notFound();
+								}
+								$args=array();
+								$num = $reflection->getNumberOfParameters();
+								if($num>0){
+									for($j=0;$j<$num;$j++){
+										if(isset($path[(5+$j)])){
+											$args[]=$path[(5+$j)];
+										}else{
+											$args[]=NULL;
+										}
+									}
+								}
+								$reflection->invokeArgs($cname,$args);
+							}else{
+								$this->notFound($newpath);
+							}
+						}else{
+							$this->notFound($newpath);
+						}
+					}else	if(is_file($filename)){
+						require_once $filename;
+						$cname = basename($filename, ".php");
+						$cname = str_replace('-','_',$cname);
+						if (!class_exists($cname, false)) {
+							trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
+							die();
+						}
+						$cname = new $cname();
+						$func = "index";
+						if(isset($path[3])){
+							if(empty($path[3])){
+								$func = "index";
+							}else{
+								$func = $path[3];
+							}
+						}
+						$func = str_replace('-','_',$func);
+						if(method_exists($cname,$func)){
+							$reflection = new ReflectionMethod($cname, $func);
+							if (!$reflection->isPublic()){
+								$this->notFound();
+							}
+							$args=array();
+							$num = $reflection->getNumberOfParameters();
+							if($num>0){
+								for($j=0;$j<$num;$j++){
+									if(isset($path[(4+$j)])){
+										$args[]=$path[(4+$j)];
+									}else{
+										$args[]=NULL;
+									}
+								}
+							}
+							$reflection->invokeArgs($cname,$args);
+						}else{
+							$this->notFound($newpath);
+						}
+					}else{
+					//die("wdnlknl");
+						$this->notFound($newpath);
+					}
+				}else{
+					$filename = realpath(SENECONTROLLER.$path[1].".php");
+					if(is_file($filename)){
+						include $filename;
+						$cname = basename($filename, ".php");
+						$cname = str_replace('-','_',$cname);
+						if(class_exists($cname)){
+							$cname = new $cname();
+							$func = "index";
+							if(isset($path[2])){
+								if(empty($path[2])){
+									$func = "index";
+								}else{
+									$func = $path[2];
+								}
+							}
+							$func = str_replace('-','_',$func);
+							if(method_exists($cname,$func)){
+								$reflection = new ReflectionMethod($cname, $func);
+								if (!$reflection->isPublic()){
+									$this->notFound();
+								}
+								$args=array();
+								$num = $reflection->getNumberOfParameters();
+								if($num>0){
+									for($j=0;$j<$num;$j++){
+										if(isset($path[(3+$j)])){
+											$args[]=$path[(3+$j)];
+										}else{
+											$args[]=NULL;
+										}
+									}
+								}
+								$reflection->invokeArgs($cname,$args);
+							}else{
+
+								$this->notFound();
+							}
+						}else{
+							//echo 'controller not found';
+							$this->notFound();
+						}
+					}else{
+						$this->notFound();
+					}
+				}
+			}else{
+				$this->defaultController();
+			}
+		}else{
+			$this->defaultController();
+		}
+	}
+	private function newRoute(){
+		$found=0;
+		$sene_method = $GLOBALS['sene_method'];
+		if(isset($_SERVER[$sene_method])){
+			$path=$_SERVER[$sene_method];
+			$path=explode("/",$path);
+			$path[1] = str_replace('-','_',$path[1]);
+			if((!empty($path[1]))){
+				$filename = realpath(SENECONTROLLER.$path[1].".php");
+				if(is_file($filename)){
+					include $filename;
+					$cname = basename($filename, ".php");
+					$cname = str_replace('-','_',$cname);
+					$cname = new $cname();
+					$func = "index";
+					if(isset($path[2])){
+						if(empty($path[2])){
+							$func = "index";
+						}else{
+							$func = $path[2];
+						}
+					}
+
+					if(method_exists($cname,$func)){
+						$reflection = new ReflectionMethod($cname, $func);
+						if (!$reflection->isPublic()){
+							$this->notFound();
+						}
+						$args=array();
+						$num = $reflection->getNumberOfParameters();
+						if($num>0){
+							for($j=0;$j<$num;$j++){
+								if(isset($path[(3+$j)])){
+									$args[]=$path[(3+$j)];
+								}else{
+									$args[]=NULL;
+								}
+							}
+						}
+						$reflection->invokeArgs($cname,$args);
+					}else{
+						$this->notFound();
+					}
+				}else{
+					$this->notFound();
+				}
+			}else{
+				$this->defaultController();
+			}
+		}else{
+			$this->defaultController();
+		}
+	}
+	private function newRoute2(){
+		$found=0;
+		$sene_method = $GLOBALS['sene_method'];
+		if(isset($_SERVER[$sene_method])){
+			$path=$_SERVER[$sene_method];
+			$path=explode("/",$path);
+			foreach (glob(SENECONTROLLER."*.php") as $filename){
+				if(isset($_SERVER['PATH_INFO'])){
+					$path[1] = str_replace('-','_',$path[1]);
+					if((!empty($path[1])) && (basename($filename, ".php")==$path[1])){
+						if(is_file($filename)){
+							include $filename;
+							$cname = basename($filename, ".php");
+							$cname = str_replace('-','_',$cname);
+							$cname = new $cname();
+							$func = "index";
+							if(isset($path[2])){
+								if(empty($path[2])){
+									$func = "index";
+								}else{
+									$func = $path[2];
+								}
+							}
+
+							if(method_exists($cname,$func)){
+								$reflection = new ReflectionMethod($cname, $func);
+								if (!$reflection->isPublic()){
+									$found=0;
+									break;
+								}
+								$args=array();
+								$num = $reflection->getNumberOfParameters();
+								if($num>0){
+									for($j=0;$j<$num;$j++){
+										if(isset($path[(3+$j)])){
+											$args[]=$path[(3+$j)];
+										}else{
+											$args[]="";
+										}
+									}
+									$reflection->invokeArgs($cname,$args);
+									$found=1;
+									break;
+								}else{
+									$reflection->invokeArgs($cname,$args);
+									$found=1;
+									break;
+								}
+
+							}else{
+								$found=0;
+								break;
+							}
+						}else{
+							$found=0;
+							break;
+						}
+					}else{
+						$found=0;
+						//continue to next file
+					}
+				}else{
+					$found=0;
+					break;
+				}
+			}
+			if($found == 0){
+				$this->notFound();
+			}
+		}else{
+			$cname = $this->default."";
+			include SENECONTROLLER.$this->default.".php";
+			$cname = new $cname();
+			$cname->index();
+		}
+	}
+	private function aktif($route=1){
+		if($route){
+			$this->newRoute();
+		}else{
+			foreach (glob(SENECONTROLLER."*.php") as $filename){
+				if(isset($_GET[basename($filename, ".php")])){
+					if(is_file($filename)){
+						include $filename;
+						foreach (glob(SENEMODEL."*.php") as $fmodel){
+							include $fmodel;
+						}
+						$content = new Content();
+						$found = 1;
+						break;
+					}else{
+						include SENEVIEW.$this->notfound.".php";
+						content();
+						///echo 'not found';
+						$found = 1;
+						break;
+					}
+				}else{
+					//print_r($_GET);
+					$found = 0;
+					//break;
+				}
+			}
+			if($found == 0){
+				include SENECONTROLLER.$this->notfound.".php";
+				$content = new Content();
+				//print_r($_GET);
+			}
+		}
+	}
+
+	private function inaktif(){
+		include SENECONTROLLER.$this->default.".php";
+		$content = new Content();
+	}
 }
 function redir($url,$time=0,$type=1){
 	if($type=="1" || $type==1){
@@ -247,11 +662,12 @@ function redir($url,$time=0,$type=1){
 			echo '<meta http-equiv="refresh" content="1;URL=\''.$url.'\'" />';
 		}
 	}else{
-		ob_start();
 		if($time>1){
+      header('HTTP/1.1 301 Moved Permanently');
 			header("Refresh:".$time."; url=".$url);
 		}else{
-			header("Location : ".$url,true,301);
+      header('HTTP/1.1 301 Moved Permanently');
+			header('Location: ' . $url);
 		}
 	}
 }
@@ -305,8 +721,8 @@ function get_caller_info() {
 	$c .= ($func != '') ? $func . "(): " : "";
 	return($c);
 }
-
 function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_context){
+	header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
 	echo '<div style="padding: 10px; background-color: #ededed;">';
 	echo '<h2 style="color: #ef0000;">Error</h2>';
 	echo '<p>File: '.$error_file.'</p>';

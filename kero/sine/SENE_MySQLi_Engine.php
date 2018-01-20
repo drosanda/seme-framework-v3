@@ -17,27 +17,28 @@ class SENE_MySQLi_Engine{
 	var $pagesize = "";
 	var $cache_save = "";
 	var $cache_flush = "";
+	var $is_limit=0;
 	var $tis_limit=0;
 	var $limit_a=0;
 	var $limit_b=0;
 	var $as_from=0;
 	var $join=0;
 	var $in_join=0;
-	
+
 	function __construct(){
 		$db = $GLOBALS['db'];
     $port = ini_get('mysqli.default_port');
-		
+
     //$this->koneksi=mysqli_connect($db['host'],$db['user'],$db['pass'],$db['name']);
-    
+
     $this->__mysqli = new mysqli($db['host'],$db['user'],$db['pass'],$db['name'],$port);
     if ($this->__mysqli->connect_errno) {
       die('Couldn\'t connect to database. Please, check your database configuration on '.SENECFG.'/database.php');
     }
     $this->__mysqli->set_charset('utf8');
-    
+
     self::$__instance = $this;
-		
+
 		$this->in_select = "";
 		$this->in_where = "";
 		$this->in_order = "";
@@ -57,17 +58,20 @@ class SENE_MySQLi_Engine{
     return self::$_instance;
   }
   public function autocommit($var=1){
-    $this->__mysqli->autocommit($var);
+    return $this->__mysqli->autocommit($var);
   }
-  public function begin($var=1){
-    $this->__mysqli->begin_transaction($var);
+  public function begin(){
+    return $this->__mysqli->begin_transaction();
   }
   public function commit(){
-    $this->__mysqli->commit();
+    return $this->__mysqli->commit();
   }
   public function rollback(){
-    $this->__mysqli->rollback();
+    return $this->__mysqli->rollback();
   }
+	public function savepoint($sp){
+		return $this->__mysqli->savepoint($sp);
+	}
 	public function debug($sql=""){
 		$this->fieldname[] = 'error';
 		$this->fieldname[] = 'code';
@@ -81,15 +85,29 @@ class SENE_MySQLi_Engine{
 		if($res){
 			return 1;
 		}else{
-			$this->debug($sql);
+			//$this->debug($sql);
+			trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 			return 0;
 		}
 	}
-	public function select_as($skey,$sval,$fn=0){
-		if(!empty($fn)){
-			$this->in_select .= "".$skey." AS '".$sval."', ";
+	public function select_as($skey,$sval="",$escape=1){
+		if(empty($escape)){
+			if(is_array($skey)){
+				foreach($skey as $k=>$v){
+					$this->in_select .= "".$k." '".$v."', ";
+				}
+			}else{
+				$this->in_select .= "".$skey." AS '".$sval."', ";
+			}
 		}else{
-			$this->in_select .= "`".$skey."` AS '".$sval."', ";
+			if(is_array($skey)){
+				foreach($skey as $k=>$v){
+					$this->in_select .= "`".$k."` AS '".$v."', ";
+				}
+			}else{
+				$this->in_select .= "`".$skey."` AS '".$sval."', ";
+			}
+
 		}
 		return $this;
 	}
@@ -102,7 +120,7 @@ class SENE_MySQLi_Engine{
 				$name = trim($names[1]);
 				$name = str_replace("`","",$name);
 				$names = explode(" ",$name);
-				
+
 				if(isset($names[0])) $name = $names[0];
 				unset($names);
 			}
@@ -157,6 +175,7 @@ class SENE_MySQLi_Engine{
 					return $dataz;
 				}else{
 					$this->debug($sql);
+					trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 					return $this->fieldvalue;
 				}
 			}
@@ -183,6 +202,7 @@ class SENE_MySQLi_Engine{
 				return $dataz;
 			}else{
 				$this->debug($sql);
+				trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 				return $this->fieldvalue;
 			}
 		}
@@ -217,9 +237,9 @@ class SENE_MySQLi_Engine{
 			$this->in_select .= "*";
 			return $this;
 		}
-		
+
 	}
-	
+
 	public function getStat(){
 		return array("fieldname"=>$this->fieldname,"fieldvalue"=>$this->fieldvalue);
 	}
@@ -228,7 +248,7 @@ class SENE_MySQLi_Engine{
 	}
 	public function esc($var){
 		if(is_array($var)){
-			
+
 		}else{
 			if(strtolower($var)=="null"){
 				return "NULL";
@@ -236,7 +256,7 @@ class SENE_MySQLi_Engine{
 				return '"'.$this->__mysqli->real_escape_string($var).'"';
 			}
 		}
-		
+
 	}
 	public function __destruct(){
 		$this->__mysqli->close();
@@ -244,7 +264,7 @@ class SENE_MySQLi_Engine{
 	public function getField(){
 		return array("field"=>$this->fieldname,"value"=>fieldvalue);
 	}
-	
+
 	/*
 	* Function Where
 	* ==========================================================
@@ -253,7 +273,7 @@ class SENE_MySQLi_Engine{
 	* kalau string berarti key
 	* Params2 -> berupa value, default kosong
 	* Params3 -> Operan AND, OR, dsb
-	* Params4 -> bisa =, <>, like, notlike, 
+	* Params4 -> bisa =, <>, like, notlike,
 	*            like%,%like,%like%
 	*            bisa juga not like%,%like,%like%
 	* -----------------------------------------------------------
@@ -355,11 +375,11 @@ class SENE_MySQLi_Engine{
 						$c = "=";
 						$val = $this->esc($v);
 				}
-				
+
 				if($bracket){
 					$this->in_where .= " ( ";
 				}
-				
+
 				$kst = explode(".",$k);
 				if(count($kst)){
 					$kst = explode(".",$k);
@@ -384,11 +404,11 @@ class SENE_MySQLi_Engine{
 		}else if(!empty($params) && !empty($params2)){
 			$val = $params2;
 			$v = $params2;
-			
+
 			if($bracket){
 				$this->in_where .= " ( ";
 			}
-			
+
 			$kst = explode(".",$params);
 			if(count($kst)){
 				$kst = explode(".",$params);
@@ -400,8 +420,8 @@ class SENE_MySQLi_Engine{
 				$this->in_where .= "`".$params."`";
 			}
 			unset($kst);
-			
-			
+
+
 			switch($comp){
 				case "like":
 					$c = "LIKE";
@@ -485,6 +505,7 @@ class SENE_MySQLi_Engine{
 					break;
 				default:
 					if($v=="IS NULL" || $v=="is null"){
+						$v = strtoupper($v);
 						$c = "";
 						$val = $v;
 					}else{
@@ -492,7 +513,7 @@ class SENE_MySQLi_Engine{
 						$val = $this->esc($v);
 					}
 			}
-			
+
 			$this->in_where .= " ".$c." ".$val." ";
 			if($bracket2){
 				$this->in_where .= " ) ";
@@ -602,7 +623,7 @@ class SENE_MySQLi_Engine{
 						$c = "=";
 						$val = $this->esc($v);
 				}
-				
+
 				if($bracket){
 					$this->in_where .= " ( ";
 				}
@@ -630,11 +651,11 @@ class SENE_MySQLi_Engine{
 		}else if(!empty($params) && !empty($params2)){
 			$val = $params2;
 			$v = $params2;
-			
+
 			if($bracket){
 				$this->in_where .= " ( ";
 			}
-			
+
 			$kst = explode(".",$params);
 			if(count($kst)){
 				$kst = explode(".",$params);
@@ -646,8 +667,8 @@ class SENE_MySQLi_Engine{
 				$this->in_where .= "".$params."";
 				unset($kst);
 			}
-			
-			
+
+
 			switch($comp){
 				case "like":
 					$c = "LIKE";
@@ -711,6 +732,7 @@ class SENE_MySQLi_Engine{
 					break;
 				default:
 					if($v=="IS NULL" || $v=="is null"){
+						$v = strtoupper($v);
 						$c = "";
 						$val = $v;
 					}else{
@@ -735,7 +757,7 @@ class SENE_MySQLi_Engine{
 			foreach($params as $k=>$v){
 				$this->in_order .= $k." ".strtoupper($v).", ";
 			}
-			
+
 		}else if(!empty($params) && !empty($params2)){
 			$this->in_order .= $params." ".strtoupper($params2).", ";
 		}
@@ -783,15 +805,39 @@ class SENE_MySQLi_Engine{
     $this->pagesize = (int) $pagesize;
 		return $this;
 	}
-	public function limit($a,$b){
+	public function nolimit(){
+		$this->tis_limit = 0;
+		$this->is_limit = 0;
+		$this->pagesize = 0;
+		$this->limit_a = 0;
+		$this->limit_b = 0;
+		return $this;
+	}
+	public function limit($a,$b=""){
 		$this->is_limit=1;
+		if(empty($b) && !empty($a)){
+			$b = $a;
+			$a = 0;
+		}
 		$this->limit_a=$a;
 		$this->limit_b=$b;
+		return $this;
 	}
-	public function page($page){
-		$this->tis_limit++;
-		$this->is_limit=0;
-		$this->page = (int) $page;
+	public function page($page,$page_size=""){
+		if(!empty($page_size) && empty($page)){
+			$this->is_limit=1;
+			$this->limit_a=0;
+			$this->limit_b=$page_size;
+		}else if(empty($page_size) && !empty($page)){
+			$this->is_limit=1;
+			$this->limit_a=0;
+			$this->limit_b=$page;
+		}else if(!empty($page_size) && !empty($page)){
+			$this->is_limit = 1;
+			$this->limit_a = ($page * $page_size) - $page_size;
+			if($page == 1) $this->limit_a = ($page * $page_size) - $page_size;
+			$this->limit_b = $page_size;
+		}
 		return $this;
 	}
 	public function limitpage($page,$pagesize=10){
@@ -804,8 +850,8 @@ class SENE_MySQLi_Engine{
 		$this->in_select = rtrim($this->in_select,", ");
 		if(empty($this->in_select)) $this->in_select = "*";
 		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
-		
-		
+
+
 		if(count($this->join) > 0){
 			//print_r($this->as_from);
 			//die();
@@ -824,41 +870,52 @@ class SENE_MySQLi_Engine{
 				trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
 				die();
 			}
-			
+
+		}else{
+			$table_alias = array_search($this->table,$this->as_from);
+			if($table_alias !== 0 ){
+				$sql .= " ".$table_alias." ";
+			}
 		}
-		
+
 		if(!empty($this->in_where)){
 			$this->in_where = rtrim($this->in_where,"AND ");
 			$this->in_where = rtrim($this->in_where,"OR ");
 			$sql .= " WHERE ".$this->in_where;
 		}
-		
+
 		if(!empty($this->in_group)){
 			$this->in_group = rtrim($this->in_group,", ");
 			$sql .= $this->in_group;
 		}
-		
+
 		if(!empty($this->in_order)){
 			$this->in_order = rtrim($this->in_order,", ");
 			$sql .= " ORDER BY ".$this->in_order;
 		}
-		
-		if(!empty($this->pagesize) && !empty($this->page) && empty($all)){
+
+		if(empty($all)){
 			if($this->is_limit){
 				$a = $this->limit_a;
 				$b = $this->limit_b;
+				$sql .= " LIMIT ".$a.", ".$b;
 			}else{
 				$b = $this->pagesize;
-				$a = ($this->page-1)*$b;
+				if((empty($page) || $page=="1" || $page==1)){
+					if(!empty($b)) $sql .= " LIMIT ".$b;
+				}else{
+					$a = $this->page;
+					$sql .= " LIMIT ".$a.",".$b;
+				}
 			}
-			$sql .= " LIMIT ".$a.", ".$b;
+
 		}
-		
+
 		$cache_save = 0;
 		if(!empty($this->cache_save)){
 			$cache_save = $this->cache_save;
 		}
-		
+
 		$cache_flush = 0;
 		if(!empty($this->cache_flush)){
 			$cache_flush = $this->cache_flush;
@@ -868,23 +925,19 @@ class SENE_MySQLi_Engine{
 		$this->flushQuery();
 		return $res;
 	}
-	
+
 	public function get_first($tipe="object",$is_debug=""){
 		$this->in_select = rtrim($this->in_select,", ");
 		if(empty($this->in_select)) $this->in_select = "*";
 		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
-		
-		
-		$table_alias = array_search($this->table,$this->as_from);
-		if($table_alias !== 0){
-			$sql .= " ".$table_alias." ";
-		}
-			
+
+
 		if(count($this->join) > 0){
 			//print_r($this->as_from);
 			//die();
 			$table_alias = array_search($this->table,$this->as_from);
 			if($table_alias !== 0 ){
+				$sql .= " ".$table_alias." ";
 				foreach($this->join as $j){
 					$sql .= strtoupper($j->method)." JOIN ";
 					$table_on = $j->table_on;
@@ -897,34 +950,43 @@ class SENE_MySQLi_Engine{
 				trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
 				die();
 			}
-			
+
+		}else{
+			$table_alias = array_search($this->table,$this->as_from);
+			if($table_alias !== 0 ){
+				$sql .= " ".$table_alias." ";
+			}
 		}
-		
+
 		if(!empty($this->in_where)){
 			$this->in_where = rtrim($this->in_where,"AND ");
 			$sql .= " WHERE ".$this->in_where;
 		}
-		
-		
+    $sql = rtrim($sql,' ');
+    $sql = rtrim($sql,' AND');
+    $sql = rtrim($sql,' OR');
+    $sql = $sql.' ';
+
+
 		if(!empty($this->in_group)){
 			$this->in_group = rtrim($this->in_group,", ");
 			$sql .= $this->in_group;
 		}
-		
+
 		if(!empty($this->in_order)){
 			$this->in_order = rtrim($this->in_order,", ");
 			$sql .= " ORDER BY ".$this->in_order;
 		}
-		
+
 		$b = 1;
 		$a = 0;
 		$sql .= " LIMIT ".$a.", ".$b;
-		
+
 		$cache_save = 0;
 		if(!empty($this->cache_save)){
 			$cache_save = $this->cache_save;
 		}
-		
+
 		$cache_flush = 0;
 		if(!empty($this->cache_flush)){
 			$cache_flush = $this->cache_flush;
@@ -932,7 +994,8 @@ class SENE_MySQLi_Engine{
 		if($is_debug) die($sql);
 		$res = $this->query($sql,$cache_save,$cache_flush,$tipe);
 		$this->flushQuery();
-		return $res;
+		if(isset($res[0])) return $res[0];
+		return new stdClass();
 	}
 	public function flushQuery(){
 		$this->in_select = "";
@@ -950,15 +1013,24 @@ class SENE_MySQLi_Engine{
 		$this->in_join = 0;
 		return $this;
 	}
+	public function query_multi($sql){
+		$this->__mysqli->multi_query($sql);
+		if($this->__mysqli->errno){
+			trigger_error($this->__mysqli->error);
+		}
+	}
+	public function insert_batch($table,$datas,$is_debug=0){
+		$this->insert_multi($table,$datas=array(),$is_debug=0);
+	}
 	public function insert_multi($table,$datas=array(),$is_debug=0){
 		//$multi_array=0;
-		
+
 		if(!is_array($datas)){
 			trigger_error("Must be array!");
 			die();
 		}
 		$sql = "INSERT INTO `".$table."`(";
-		
+
 		foreach($datas as $data){
 			if(!is_array($data)){
 				trigger_error("Must be array!");
@@ -971,7 +1043,7 @@ class SENE_MySQLi_Engine{
 		}
 		$sql = rtrim($sql,",");
 		$sql .= ") VALUES(";
-		
+
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
 				if(strtolower($val)=="now()" || strtolower($val)=="null"){
@@ -981,11 +1053,11 @@ class SENE_MySQLi_Engine{
 				}
 			}
 			$sql = rtrim($sql,",");
-			$sql .= "),(";			
+			$sql .= "),(";
 		}
 		$sql = rtrim($sql,",(");
 		$sql .= ";";
-		
+
 		if($is_debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
@@ -993,13 +1065,13 @@ class SENE_MySQLi_Engine{
 	}
 	public function insert_ignore_multi($table,$datas=array(),$is_debug=0){
 		//$multi_array=0;
-		
+
 		if(!is_array($datas)){
 			trigger_error("Must be array!");
 			die();
 		}
 		$sql = "INSERT IGNORE INTO `".$table."`(";
-		
+
 		foreach($datas as $data){
 			if(!is_array($data)){
 				trigger_error("Must be array!");
@@ -1012,7 +1084,7 @@ class SENE_MySQLi_Engine{
 		}
 		$sql = rtrim($sql,",");
 		$sql .= ") VALUES(";
-		
+
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
 				if(strtolower($val)=="now()" || strtolower($val)=="null"){
@@ -1022,18 +1094,18 @@ class SENE_MySQLi_Engine{
 				}
 			}
 			$sql = rtrim($sql,",");
-			$sql .= "),(";			
+			$sql .= "),(";
 		}
 		$sql = rtrim($sql,",(");
 		$sql .= ";";
-		
+
 		if($is_debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
 		return $res;
 	}
 	public function insert($table,$datas=array(),$multi_array=0,$is_debug=0){
-		//$multi_array=0;		
+		//$multi_array=0;
 		$this->last_id = 0;
 		if(!is_array($datas)){
 			trigger_error("Must be array!");
@@ -1043,13 +1115,13 @@ class SENE_MySQLi_Engine{
 			$this->insert_multi($table,$datas,$is_debug);
 		}else{
 			$sql = "INSERT INTO `".$table."`(";
-			
+
 			foreach($datas as $key=>$val){
 				$sql .="`".$key."`,";
 			}
 			$sql  = rtrim($sql,",");
 			$sql .= ") VALUES(";
-			
+
 			foreach($datas as $key=>$val){
 				if($val=="NOW()" || $val=="now()"){
 					$sql .="".$val.",";
@@ -1061,7 +1133,7 @@ class SENE_MySQLi_Engine{
 			}
 			$sql = rtrim($sql,",");
 			$sql .= ");";
-			
+
 			if($is_debug) die($sql);
 			$res = $this->exec($sql);
 			$this->last_id = $this->lastId();
@@ -1077,9 +1149,9 @@ class SENE_MySQLi_Engine{
 			trigger_error("Must be array!");
 			die();
 		}
-		
+
 		$sql = "UPDATE `".$table."` SET ";
-		
+
 		foreach($datas as $key=>$val){
 			if($val=="now()" || $val=="NOW()" || $val=="NULL" || $val=="null"){
 				$sql .="`".$key."` = ".$val.",";
@@ -1087,15 +1159,15 @@ class SENE_MySQLi_Engine{
 				$sql .="`".$key."` = ".$this->esc($val).",";
 			}
 		}
-		
+
 		$sql = rtrim($sql,",");
-		
+
 		if(!empty($this->in_where)){
 			$this->in_where = rtrim($this->in_where,"AND ");
 			$this->in_where = rtrim($this->in_where,"OR ");
 			$sql .= " WHERE ".$this->in_where;
 		}
-		
+
 		if(!empty($this->pagesize) && ($this->tis_limit>0)){
 			$b = $this->pagesize;
 			$sql .= " LIMIT ".$b;
@@ -1110,9 +1182,9 @@ class SENE_MySQLi_Engine{
 			trigger_error("Missing table name while deleting");
 			die();
 		}
-		
+
 		$sql = "DELETE FROM `".$table."`";
-		
+
 		if(!empty($this->in_where)){
 			$this->in_where = rtrim($this->in_where,"AND ");
 			$this->in_where = rtrim($this->in_where,"OR ");
@@ -1128,24 +1200,24 @@ class SENE_MySQLi_Engine{
 		return $res;
 	}
 	public function join($table,$as,$key,$table_on="",$on,$method="left"){
-		if(isset($this->as_from[$as])){ 
+		if(isset($this->as_from[$as])){
 			//trigger_error('Alias on join method has been used!');
 			//die();
 		}else{
-			
+
 			$join = new stdClass();
 			$join->table = $table;
 			$join->table_as = $as;
 			$join->table_key = $key;
-			
+
 			$join->table_on = $table_on;
 			$join->key_on = $on;
-			
-			
+
+
 			$join->method = $method;
-			
+
 			$this->as_from[$as] = $table;
-			
+
 			$this->join[$this->in_join] = $join;
 			$this->in_join = $this->in_join+1;
 		}
@@ -1155,7 +1227,7 @@ class SENE_MySQLi_Engine{
 		$this->in_where .= "(";
 		$this->in_where .= " ".$key."";
 		if($is_not) $this->in_where .= " NOT ";
-		$this->in_where .= "BETWEEN ".$val1." AND ".$val2."";
+		$this->in_where .= " BETWEEN ".$val1." AND ".$val2."";
 		$this->in_where .= ") AND ";
 		return $this;
 	}
@@ -1170,9 +1242,9 @@ class SENE_MySQLi_Engine{
 		}
 		return $this;
 	}
-	
+
 	public function replace($table,$datas=array(),$multi_array=0,$is_debug=0){
-		//$multi_array=0;		
+		//$multi_array=0;
 		$this->last_id = 0;
 		if(!is_array($datas)){
 			trigger_error("Must be array!");
@@ -1182,13 +1254,13 @@ class SENE_MySQLi_Engine{
 			$this->replace_multi($table,$datas,$is_debug);
 		}else{
 			$sql = "REPLACE INTO `".$table."`(";
-			
+
 			foreach($datas as $key=>$val){
 				$sql .="`".$key."`,";
 			}
 			$sql  = rtrim($sql,",");
 			$sql .= ") VALUES(";
-			
+
 			foreach($datas as $key=>$val){
 				if($val=="NOW()" || $val=="now()"){
 					$sql .="".$val.",";
@@ -1200,7 +1272,7 @@ class SENE_MySQLi_Engine{
 			}
 			$sql = rtrim($sql,",");
 			$sql .= ");";
-			
+
 			if($is_debug) die($sql);
 			$res = $this->exec($sql);
 			$this->last_id = $this->lastId();
@@ -1210,13 +1282,13 @@ class SENE_MySQLi_Engine{
 	}
 	public function replace_multi($table,$datas=array(),$is_debug=0){
 		//$multi_array=0;
-		
+
 		if(!is_array($datas)){
 			trigger_error("Must be array!");
 			die();
 		}
 		$sql = "REPLACE INTO `".$table."` (";
-		
+
 		foreach($datas as $data){
 			if(!is_array($data)){
 				trigger_error("Must be array!");
@@ -1233,7 +1305,7 @@ class SENE_MySQLi_Engine{
 		}
 		$sql = rtrim($sql,",");
 		$sql .= ") VALUES(";
-		
+
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
 				if(strtolower($val)=="now()" || strtolower($val)=="null"){
@@ -1243,11 +1315,11 @@ class SENE_MySQLi_Engine{
 				}
 			}
 			$sql = rtrim($sql,",");
-			$sql .= "),(";			
+			$sql .= "),(";
 		}
 		$sql = rtrim($sql,",(");
 		$sql .= ";";
-		
+
 		if($is_debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
@@ -1255,16 +1327,16 @@ class SENE_MySQLi_Engine{
 	}
 	public function where_in($tbl_key,$values,$is_not="0",$after="AND"){
 		$not = '';
-		
+
 		if($is_not == '1' || $is_not == 1) $not = 'NOT';
-		
+
 		$this->in_where .= ' '.$tbl_key.' '.$not.' IN (';
 		foreach($values as $v){
 			$this->in_where .= $this->esc($v).", ";
 		}
 		$this->in_where = rtrim($this->in_where,", ");
 		$this->in_where .= ') '.$after.' ';
-		
+
 		return $this;
 	}
 }
