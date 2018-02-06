@@ -28,10 +28,16 @@ class SENE_MySQLi_Engine{
 	function __construct(){
 		$db = $GLOBALS['db'];
     $port = ini_get('mysqli.default_port');
-
+		mysqli_report(MYSQLI_REPORT_STRICT);
     //$this->koneksi=mysqli_connect($db['host'],$db['user'],$db['pass'],$db['name']);
 
-    $this->__mysqli = new mysqli($db['host'],$db['user'],$db['pass'],$db['name'],$port);
+    $this->__mysqli = new mysqli();
+		try {
+			$this->__mysqli->connect($db['host'],$db['user'],$db['pass'],$db['name'],$port);
+		}catch(Exception $e){
+			trigger_error('Tidak dapat tersambung ke database.');
+			die();
+		}
     if ($this->__mysqli->connect_errno) {
       die('Couldn\'t connect to database. Please, check your database configuration on '.SENECFG.'/database.php');
     }
@@ -259,7 +265,7 @@ class SENE_MySQLi_Engine{
 
 	}
 	public function __destruct(){
-		$this->__mysqli->close();
+		if(is_resource($this->__mysqli)) $this->__mysqli->close();
 	}
 	public function getField(){
 		return array("field"=>$this->fieldname,"value"=>fieldvalue);
@@ -543,85 +549,85 @@ class SENE_MySQLi_Engine{
 				switch($comp){
 					case "like":
 						$c= "LIKE";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case 'like%':
 						$c= "LIKE";
-						$val = ''.$v.'%';
-						$val = $this->esc($val);
+						$val = '\''.$v.'%\'';
+						$val = ($val);
 						break;
 					case '%like':
 						$c= "LIKE";
-						$val = '%'.$v.'';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'\'';
+						$val = ($val);
 						break;
 					case 'like%%':
 						$c= "LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case '%like%':
 						$c= "LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case "notlike":
 						$c= "NOT LIKE";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "notlike%%":
 						$c= "NOT LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case "%notlike%":
 						$c= "NOT LIKE";
-						$val = '%'.$v.'%';
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'%\'';
+						$val = ($val);
 						break;
 					case "notlike%":
 						$c= "NOT LIKE";
-						$val = "".$v.'%';
-						$val = $this->esc($val);
+						$val = '\''.$v.'%\'';
+						$val = ($val);
 						break;
 					case "%notlike":
 						$c= "NOT LIKE";
-						$val = '%'.$v."";
-						$val = $this->esc($val);
+						$val = '\'%'.$v.'\'';
+						$val = ($val);
 						break;
 					case "!=":
 						$c= "<>";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "<>":
 						$c= "<>";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case ">=":
 						$c= ">=";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "<=":
 						$c= "<=";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case ">":
 						$c= ">";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					case "<":
 						$c= "<";
 						$val = "".$v."";
-						$val = $this->esc($val);
+						$val = ($val);
 						break;
 					default:
 						$c = "=";
-						$val = $this->esc($v);
+						$val = ($v);
 				}
 
 				if($bracket){
@@ -672,63 +678,83 @@ class SENE_MySQLi_Engine{
 			switch($comp){
 				case "like":
 					$c = "LIKE";
-					$val = $this->esc($val);
+					$val = ($val);
 					break;
 				case 'like%':
 					$c= "LIKE";
-					$val = "".$v.'%';
+					$val = "\'".$v.'%\'';
 					//die($val);
-					$val = $this->esc($val);
+					$val = ($val);
 					//die($val);
 					break;
 				case '%like':
 					$c= "LIKE";
-					$val = '%'.$v."";
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'\'';
+					$val = ($val);
 					break;
 				case 'like%%':
 					$c= "LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "%like%":
 					$c= "LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "notlike":
 					$c= "NOT LIKE";
-					$val = $this->esc($val);
+					$val = ($val);
 					break;
 				case "notlike%%":
 					$c= "NOT LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "%notlike%":
 					$c= "NOT LIKE";
-					$val = '%'.$v.'%';
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'%\'';
+					$val = ($val);
 					break;
 				case "notlike%":
 					$c= "NOT LIKE";
-					$val = "".$v.'%';
-					$val = $this->esc($val);
+					$val = '\''.$v.'%\'';
+					$val = ($val);
 					break;
 				case "%notlike":
 					$c= "NOT LIKE";
-					$val = '%'.$v."";
-					$val = $this->esc($val);
+					$val = '\'%'.$v.'\'';
+					$val = ($val);
 					break;
 				case "!=":
 					$c= "<>";
 					$val = "".$v."";
-					$val = $this->esc($val);
+					$val = ($val);
 					break;
 				case "<>":
 					$c= "<>";
 					$val = "".$v."";
-					$val = $this->esc($val);
+					$val = ($val);
+					break;
+				case ">":
+					$c= ">";
+					$val = "".$v."";
+					$val = ($val);
+					break;
+				case ">=":
+					$c= ">=";
+					$val = "".$v."";
+					$val = ($val);
+					break;
+				case "<":
+					$c= "<";
+					$val = "".$v."";
+					$val = ($val);
+					break;
+				case "<=":
+					$c= "<=";
+					$val = "".$v."";
+					$val = ($val);
 					break;
 				default:
 					if($v=="IS NULL" || $v=="is null"){
@@ -737,7 +763,7 @@ class SENE_MySQLi_Engine{
 						$val = $v;
 					}else{
 						$c = "=";
-						$val = $this->esc($v);
+						$val = $v;
 					}
 			}
 			$this->in_where .= " ".$c." ".$val." ";

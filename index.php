@@ -2,9 +2,6 @@
 session_start();
 ini_set("error_reporting",E_ALL);
 $website_view_id = 1; // default
-if($_SERVER['SERVER_NAME']=="bandros.local"){
-	$website_view_id = 1;
-}
 $admin_secret_url = 'adminMaster';
 
 $apps_dir='app';
