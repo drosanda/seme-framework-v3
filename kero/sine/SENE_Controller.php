@@ -65,9 +65,11 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
+			$v = str_replace('\\','/',$v);
+			$v = str_replace('//','/',$v);
+			$v = str_replace(SENEROOT,'',$v);
 			trigger_error("unable to putThemeContent ".$v.".php");
 			die();
-			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	public function getRightMenuTitle(){
@@ -91,9 +93,11 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			trigger_error("unable to putThemeContent ".$v.".php");
+			$v = str_replace('\\','/',$v);
+			$v = str_replace('//','/',$v);
+			$v = str_replace(SENEROOT,'',$v);
+			trigger_error("unable to putThemeRightContent ".$v.".php");
 			die();
-			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	//sidemenuleft
@@ -112,9 +116,11 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			trigger_error("unable to putThemeContent ".$v.".php");
+			$v = str_replace('\\','/',$v);
+			$v = str_replace('//','/',$v);
+			$v = str_replace(SENEROOT,'',$v);
+			trigger_error("unable to putThemeLeftContent ".$v.".php");
 			die();
-			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	public function putJsReady($tc="",$__forward=array()){
@@ -132,9 +138,11 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			trigger_error("unable to putThemeContent ".$v.".php");
+			$v = str_replace('\\','/',$v);
+			$v = str_replace('//','/',$v);
+			$v = str_replace(SENEROOT,'',$v);
+			trigger_error("putJsReady unable to load  ".$v.".php");
 			die();
-			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	public function getThemeContent(){
@@ -167,9 +175,11 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			trigger_error("unable to putThemeContent ".$v.".php");
+			$v = str_replace('\\','/',$v);
+			$v = str_replace('//','/',$v);
+			$v = str_replace(SENEROOT,'',$v);
+			trigger_error("putJsContent unable to load  ".$v.".php");
 			die();
-			//die("unable to putThemeContent ".$v.".php");
 		}
 	}
 	public function putBodyBefore($tc="",$__forward=array()){
@@ -187,7 +197,10 @@ abstract class SENE_Controller{
 			ob_end_clean();
 			return 0;
 		}else{
-			trigger_error("unable to putThemeContent ".$v.".php");
+			$v = str_replace('\\','/',$v);
+			$v = str_replace('//','/',$v);
+			$v = str_replace(SENEROOT,'',$v);
+			trigger_error("putBodyBefore unable to load ".$v.".php");
 			die();
 		}
 	}

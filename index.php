@@ -66,24 +66,25 @@ if(!is_dir($kerosine_dir)){
 	die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($library_dir)){
-	die("missing library dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing library dir:  please create directory in $library_dir");
 }
 if(!is_dir($config_dir)){
 	die("missing config dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($cache_dir)){
-	die("missing cache dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing cache dir: please create directory in $cache_dir");
 }
 if(!is_dir($model_dir)){
-	die("missing nodel dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
-}if(!is_dir($view_dir)){
-	die("missing view dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
-	}
+	die("missing nodel dir: please create directory in $model_dir");
+}
+if(!is_dir($view_dir)){
+	die("missing view dir: please create directory in $view_dir");
+}
 if(!is_dir($controller_dir)){
-	die("missing controller dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing controller dir: please create directory in $controller_dir");
 }
 if(!is_dir($core_dir)){
-	die("missing core dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing core dir: please create directory in $core_dir");
 }
 
 $apps_dir = rtrim($apps_dir, '/').'/';
@@ -155,7 +156,6 @@ if(!isset($admin_url)){
 }
 define("ADMIN_URL",$admin_url);
 define("WEBSITE_VIEW_ID",$website_view_id);
-
 
 require_once SENEKEROSINE."/SENE_Engine.php";
 $se = new SENE_Engine($db);

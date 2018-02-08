@@ -116,6 +116,7 @@ class Home extends SENE_Controller{
 	}
 	public function index(){
 		$this->view('front/home');
+		$this->render(); // version 3
 	}
 }
 ```
@@ -127,7 +128,7 @@ Seme Framework allowing you to create template or layout that consist of separat
 ```
 
 ## More Guides
-Look for more guides in https://www.nyingspot.com/author/seme_framework/ (Bahasa) and https://seme.nyingspot.com/ (English).
+Look for more guides https://seme.nyingspot.com/ (English) and https://www.nyingspot.com/author/seme_framework/ (Bahasa)
 
 ## License
 Seme Framework licensed under MIT License 2.0
