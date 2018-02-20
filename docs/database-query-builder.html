@@ -144,10 +144,112 @@ $this->db->select('column_name2');</pre>
 					<hr>
         </div>
 				
+        <div class="large12 columns">
+          <h2 class="">Condition: Where</h2>
+          <p>Filtered query result using where syntax SQL.</p>
+					<pre>$this->db->where($params,$params2="",$operand="AND",$comp="=",$bracket=0,$bracket2=0);</pre>
+					<p>Method where consist of 6 parameters:
+						<ol>
+							<li>Parameter-1 contain table field (key) string or name value pair array.</li>
+							<li>Parameter-2 contain about string table value. If parameter-1 is array, this parameter will be ignored.</li>
+							<li>Parameter-3 contain about operand, like AND or OR. Default value is AND.</li>
+							<li>Parameter-4 contain about comparison operand, default is =. Can be fill by:
+								<ul>
+									<li>=</li>
+									<li>!=</li>
+									<li>&lt;&gt;</li>
+									<li>&gt;=</li>
+									<li>&lt;=</li>
+									<li>like</li>
+									<li>like%</li>
+									<li>like%%</li>
+									<li>%like%</li>
+									<li>%like</li>
+									<li>notlike</li>
+									<li>notlike%</li>
+									<li>%notlike%</li>
+								</ul>
+							</li>
+							<li>Parameter-5 add open bracket for start priority processing.</li>
+							<li>Parameter-6 add close bracket for end priority processing.</li>
+						</ol>
+						All value passed to parameter-1 and parameter-2 automatically escaped. This has supported chaining method.
+					</p>
+					<hr>
+        </div>
+        <div class="large12 columns">
+          <h2 class="">Condition: Where_As</h2>
+          <p>Filtered query result using where syntax SQL. But this query not automatically escaped query. So please be avoiding security breach by using db Escape method.</p>
+					<pre>$this->db->where_as($params,$params2="",$operand="AND",$comp="=",$bracket=0,$bracket2=0);</pre>
+					<p>Method where_as consist of 6 parameters:
+						<ol>
+							<li>Parameter-1 contain table field (key) string or name value pair array.</li>
+							<li>Parameter-2 contain about string table value. If parameter-1 is array, this parameter will be ignored.</li>
+							<li>Parameter-3 contain about operand, like AND or OR. Default value is AND.</li>
+							<li>Parameter-4 contain about comparison operand, default is =. Can be fill by :
+								<ul>
+									<li>=</li>
+									<li>!=</li>
+									<li>&lt;&gt;</li>
+									<li>&gt;=</li>
+									<li>&lt;=</li>
+									<li>like</li>
+									<li>like%</li>
+									<li>like%%</li>
+									<li>%like%</li>
+									<li>%like</li>
+									<li>notlike</li>
+									<li>notlike%</li>
+									<li>%notlike%</li>
+								</ul>
+							</li>
+							<li>Parameter-5 add open bracket for start priority processing.</li>
+							<li>Parameter-6 add close bracket for end priority processing.</li>
+						</ol>
+						All value passed to parameter-1 and parameter-2 unescaped string. This method has chaining method.
+					</p>
+					<hr>
+        </div>
+        <div class="large12 columns">
+          <h2 class="">Condition: Where_In</h2>
+          <p>Filtered query result using Where In SQL syntax.</p>
+					<pre>$this->db->where_in($tbl_key,$arr_values=array(),$is_not="0",$comp="AND");</pre>
+					<p>Method where_in consist of 4 parameters:
+						<ol>
+							<li>Parameter-1 contain table field (key) string to be filtered in.</li>
+							<li>Parameter-2 contain about array of values.</li>
+							<li>Parameter-3 contain about negation, if true (1) apply negation (WHERE NOT IN) otherwise WHERE IN. Default 0.</li>
+							<li>Parameter-4 contain about comparison operand, default is AND. Can be fill by AND or OR.</li>
+						</ol>
+						All value passed to parameter-1 and parameter-2 automatically escaped. This method has chaining method.
+					</p>
+					<hr>
+        </div>
+        <div class="large12 columns">
+          <h2 class="">Escape</h2>
+          <p>Escapes special characters in a string for use in an SQL statement. Especially used in where_as parameter-2. Make your input charset friendly.</p>
+					<pre>$this->db->esc($str);</pre>
+					<p>Consist of 1 parameters contain about unescaped string. Returned escaped string.</p>
+					<hr>
+        </div>
+        <div class="large12 columns">
+          <h2 class="">Database Character Set</h2>
+          <p>Seme Framework has supported for advanced character set like UTF8MB4 which is can be applied for MySQL 5.6 or higher. Default charset connection is UTF8.</p>
+					<h3>Set Character Set</h3>
+					<p>Setup or change character set can be applied using setCharSet method.</p>
+					<pre>$this->db->setCharSet($charset);</pre>
+					<p>Consist of 1 parameters contain about unescaped string. Returned true if success otherwise will triggered error.</p>
+					<h3>Get Character Set</h3>
+					<p>Get current character set.</p>
+					<pre>$this->db->getCharSet();</pre>
+					<p>Returned character set name if success otherwise will triggered error.</p>
+					<hr>
+        </div>
+				
       </div>
       <div class="row footer">
         <div class="large-12 columns">
-          <p class="">Copyright &copy; 2014-2018, Daeng Rosanda, S.Kom. Last updated on 20 Januari 2018.</p>
+          <p class="">Copyright &copy; 2014-2018, Daeng Rosanda, S.Kom. Last updated on 20 Februari 2018.</p>
         </div>
       </div>
     </div>

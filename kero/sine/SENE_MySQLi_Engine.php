@@ -1365,4 +1365,18 @@ class SENE_MySQLi_Engine{
 
 		return $this;
 	}
+	public function getCharSet(){
+		$res = $this->__mysqli->character_set_name();
+		if(!$res){
+			trigger_error('Cant get charset '.$char_set.' to database.');
+		}
+		return $res;
+	}
+	public function setCharSet($char_set){
+		$res = $this->__mysqli->set_charset($char_set);
+		if(!$res){
+			trigger_error('Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
+		}
+		return 1;
+	}
 }
