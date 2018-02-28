@@ -2,7 +2,7 @@
 session_start();
 ini_set("error_reporting",E_ALL);
 $website_view_id = 1; // default
-$admin_secret_url = 'adminMaster';
+$admin_secret_url = 'admin';
 
 $apps_dir='app';
 $assets_dir='assets';
