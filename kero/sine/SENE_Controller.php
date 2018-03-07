@@ -134,7 +134,7 @@ abstract class SENE_Controller{
 			unset($_SESSION[$keytemp]);
 			ob_start();
 			require_once($v.".php");
-			$this->js_ready = ob_get_contents();
+			$this->js_ready .= ob_get_contents();
 			ob_end_clean();
 			return 0;
 		}else{
@@ -144,6 +144,9 @@ abstract class SENE_Controller{
 			trigger_error("putJsReady unable to load  ".$v.".php");
 			die();
 		}
+	}
+	public function clearJsReady(){
+		$this->js_ready = '';
 	}
 	public function getThemeContent(){
 		echo $this->__themeContent;
