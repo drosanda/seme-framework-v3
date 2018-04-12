@@ -533,10 +533,6 @@ class SENE_MySQLi_Engine{
 		return $this;
 	}
 	public function where_as($params,$params2="",$operand="AND",$comp="=",$bracket=0,$bracket2=0){
-		//die("params: ".$params);
-		//die("params2: ".$params2);
-		//die("operand: ".$operand);
-		//die("comp: ".$comp);
 		$comp = strtolower($comp);
 		$c="=";
 		$operand = strtoupper($operand);
@@ -633,17 +629,9 @@ class SENE_MySQLi_Engine{
 				if($bracket){
 					$this->in_where .= " ( ";
 				}
-				$kst = explode(".",$k);
-				if(count($kst)){
-					$kst = explode(".",$k);
-					foreach($kst as $ks){
-						$this->in_where .= "".$ks.".";
-					}
-					$this->in_where = rtrim($this->in_where,".");
-				}else{
-					$this->in_where .= "".$k."";
-					unset($kst);
-				}
+				$this->in_where .= "".$k."";
+				unset($kst);
+				
 				$this->in_where .= " ".$c." ".$val."";
 				if($bracket2){
 					$this->in_where .= " ) ";
@@ -683,9 +671,7 @@ class SENE_MySQLi_Engine{
 				case 'like%':
 					$c= "LIKE";
 					$val = "\'".$v.'%\'';
-					//die($val);
 					$val = ($val);
-					//die($val);
 					break;
 				case '%like':
 					$c= "LIKE";
@@ -756,6 +742,16 @@ class SENE_MySQLi_Engine{
 					$val = "".$v."";
 					$val = ($val);
 					break;
+				case ">":
+					$c= ">";
+					$val = "".$v."";
+					$val = ($val);
+					break;
+				case "<":
+					$c= "<";
+					$val = "".$v."";
+					$val = ($val);
+					break;
 				default:
 					if($v=="IS NULL" || $v=="is null"){
 						$v = strtoupper($v);
@@ -771,6 +767,9 @@ class SENE_MySQLi_Engine{
 				$this->in_where .= " ) ";
 			}
 			$this->in_where .=  " ".$operand." ";
+			
+			$this->in_where = trim($this->in_where,"=");
+			
 			unset($c);
 			unset($v);
 			unset($k);
@@ -1028,11 +1027,11 @@ class SENE_MySQLi_Engine{
 		$this->in_where = "";
 		$this->in_order = "";
 		$this->in_group = "";
-		$this->pagesize = 10;
-		$this->page = 1;
+		$this->pagesize = 0;
+		$this->page = 0;
 		$this->is_limit = 0;
-		$this->limit_a = 10;
-		$this->limit_b = 10;
+		$this->limit_a = 0;
+		$this->limit_b = 0;
 		$this->tis_limit = 0;
 		$this->as_from = array();
 		$this->join = array();
@@ -1226,11 +1225,6 @@ class SENE_MySQLi_Engine{
 		return $res;
 	}
 	public function join($table,$as,$key,$table_on="",$on,$method="left"){
-		if(isset($this->as_from[$as])){
-			//trigger_error('Alias on join method has been used!');
-			//die();
-		}else{
-
 			$join = new stdClass();
 			$join->table = $table;
 			$join->table_as = $as;
@@ -1246,7 +1240,7 @@ class SENE_MySQLi_Engine{
 
 			$this->join[$this->in_join] = $join;
 			$this->in_join = $this->in_join+1;
-		}
+		
 		return $this;
 	}
 	public function between($key,$val1,$val2,$is_not=0){
