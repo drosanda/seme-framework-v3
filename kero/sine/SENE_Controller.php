@@ -145,9 +145,9 @@ abstract class SENE_Controller{
 			die();
 		}
 	}
-	public function clearJsReady(){
-		$this->js_ready = '';
-	}
+  public function clearJsReady(){
+  		$this->js_ready = '';
+  }
 	public function getThemeContent(){
 		echo $this->__themeContent;
 	}
@@ -228,13 +228,16 @@ abstract class SENE_Controller{
 		}
 	}
 	public function fgc($path){
+		$x = json_encode(array());
 		if(file_exists($path)){
 			$f = fopen($path, "r");
-			$x = fread($f, filesize($path));
+			if(filesize($path)>0){
+				$x = fread($f, filesize($path));
+			}
 			fclose($f);
 			unset($f);
-			return $x;
 		}
+		return $x;
 	}
 	public function putJsFooter($stype,$is_external=0){
 		if($is_external){
@@ -437,10 +440,12 @@ abstract class SENE_Controller{
 			if(empty($malias)) $malias = $cname;
 			$malias = strtolower($malias);
 			if(file_exists($mfile)){
-				require_once $mfile;
+				if(!class_exists($cname)){
+					require_once $mfile;
+				}
 				$this->{$malias} = new $cname();
 			}else{
-				trigger_error('could not find '.$mfile.' model on '.SENEMODEL);
+				trigger_error('could not find model '.$item.'  on '.$mfile);
 				//die();
 			}
 		}elseif($type=="lib"){
@@ -451,13 +456,13 @@ abstract class SENE_Controller{
 				require_once $mfile;
 				$this->$malias = new $malias();
 			}else{
-				die('could not find '.$mfile.' library on '.SENELIB);
+				trigger_error('could not find library '.$item.'  on '.$mfile);
 			}
 		}else{
 			if(file_exists(SENELIB.$item.'.php')){
 				require_once SENELIB.$item.'.php';
 			}else{
-				die('could not find '.$item.' library on '.SENELIB);
+				trigger_error('could not find require_once library '.$item.' on '.$mfile);
 			}
 		}
 	}
@@ -518,7 +523,7 @@ abstract class SENE_Controller{
 		}
 	}
 	protected function lib($data,$lalias="",$type="lib"){
-
+		//die($type);
 		if($type=='lib'){
 			$lpath = str_replace("\\","/",SENELIB.$data.".php");
 			if(file_exists(strtolower($lpath))){

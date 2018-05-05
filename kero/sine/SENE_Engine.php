@@ -173,7 +173,7 @@ class SENE_Engine{
 							$cname = basename($filename, ".php");
 							$cname = str_replace('-','_',$cname);
 							if (!class_exists($cname, false)) {
-								trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
+								trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER.$path[2].'/'.$path[3].".php", E_USER_ERROR);
 								die();
 							}
 							$cname = new $cname();
@@ -656,7 +656,7 @@ class SENE_Engine{
 		$content = new Content();
 	}
 }
-function redir($url,$time=0,$type=1){
+function redir($url,$time=0,$type=0){
 	if($type=="1" || $type==1){
 		if($time){
 			echo '<meta http-equiv="refresh" content="'.$time.';URL=\''.$url.'\'" />';
@@ -728,7 +728,7 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
 	$backtraces = debug_backtrace();
 	$bct = array();
 	$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
-	
+
 	$ef = explode('/',str_replace('\\','/',$error_file));
 	if(isset($ef[count($ef)-1])) $ef = $ef[count($ef)-1];
 	if(in_array(strtolower($ef),$fls)){
@@ -736,8 +736,10 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
 		$error_line = '';
 	}
 	$i=0;
+	$bcts = array();
 	foreach($backtraces as $bts){
 		if(!isset($bts['file'])) continue;
+		$bcts[] = $bts;
 		$filename = explode('/',str_replace('\\','/',$bts['file']));
 		if(isset($filename[count($filename)-1])) $filename = $filename[count($filename)-1];
 		$bts['filename'] = $filename;
@@ -750,7 +752,11 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
 		}
 		$i++;
 	}
-	
+	if(empty($error_file) || empty($error_line)){
+		$error_file = $bcts[0]['file'];
+		$error_line = $bcts[0]['line'];
+	}
+
 	echo '<div style="padding: 10px; background-color: #ededed;">';
 	echo '<h2 style="color: #ef0000;">Error</h2>';
 	echo '<p>File: '.$error_file.'</p>';
@@ -768,17 +774,17 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
 		if(!isset($e['file'])) continue;
 		echo '<p><b>File</b>: '.$e['file'].'</p>';
 		echo '<p><b>Line</b>: '.$e['line'].'</p>';
-		if(isset($e['class'])){ 
+		if(isset($e['class'])){
 			echo '<p><b>Class</b>: '.$e['class'].'</p>';
 			echo '<p><b>Method</b>: '.$e['function'].'</p>';
 		}else{
 			echo '<p><b>Function</b>: '.$e['function'].'</p>';
 		}
-		
+
 		echo '<hr>';
 	}
 	echo '</div>';
-  echo "<hr><p><small>Seme Framework Error Handler</small></p>";
+  echo "<hr><p><small>Seme Framework v".SENE_VERSION." Error Handler</small></p>";
   die();
 }
 set_error_handler("seme_error_handling");

@@ -407,7 +407,7 @@ class SENE_MySQLi_Engine{
 			unset($v);
 			unset($k);
 			unset($val);
-		}else if(!empty($params) && !empty($params2)){
+		}else if(!empty($params) && strlen($params2)){
 			$val = $params2;
 			$v = $params2;
 
@@ -510,7 +510,7 @@ class SENE_MySQLi_Engine{
 					$val = $this->esc($val);
 					break;
 				default:
-					if($v=="IS NULL" || $v=="is null"){
+					if(strtolower($v) == "is null"){
 						$v = strtoupper($v);
 						$c = "";
 						$val = $v;
@@ -642,7 +642,7 @@ class SENE_MySQLi_Engine{
 			unset($v);
 			unset($k);
 			unset($val);
-		}else if(!empty($params) && !empty($params2)){
+		}else if(!empty($params) && strlen($params2)){
 			$val = $params2;
 			$v = $params2;
 
@@ -753,7 +753,7 @@ class SENE_MySQLi_Engine{
 					$val = ($val);
 					break;
 				default:
-					if($v=="IS NULL" || $v=="is null"){
+					if(strtolower($v) == "is null"){
 						$v = strtoupper($v);
 						$c = "";
 						$val = $v;
@@ -1072,7 +1072,7 @@ class SENE_MySQLi_Engine{
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
 				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
@@ -1113,7 +1113,7 @@ class SENE_MySQLi_Engine{
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
 				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
@@ -1148,8 +1148,8 @@ class SENE_MySQLi_Engine{
 			$sql .= ") VALUES(";
 
 			foreach($datas as $key=>$val){
-				if($val=="NOW()" || $val=="now()"){
-					$sql .="".$val.",";
+				if(strtolower($val) == "now()"){
+					$sql .="".strtoupper($val).",";
 				}else if(strtolower($val)=="null"){
 					$sql .="NULL,";
 				}else{
@@ -1178,7 +1178,7 @@ class SENE_MySQLi_Engine{
 		$sql = "UPDATE `".$table."` SET ";
 
 		foreach($datas as $key=>$val){
-			if($val=="now()" || $val=="NOW()" || $val=="NULL" || $val=="null"){
+			if(strtoupper($val) == "NOW()" || strtoupper($val) == "NULL"){
 				$sql .="`".$key."` = ".$val.",";
 			}else{
 				$sql .="`".$key."` = ".$this->esc($val).",";
@@ -1316,7 +1316,7 @@ class SENE_MySQLi_Engine{
 			}
 			foreach($data as $key=>$val){
 				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
@@ -1329,7 +1329,7 @@ class SENE_MySQLi_Engine{
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
 				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
