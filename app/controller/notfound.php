@@ -1,14 +1,14 @@
 <?php
-class Notfound extends SENE_Controller{
+class Notfound extends JI_Controller{
 	public function __constructx(){
     parent::__construct();
-		
-	}
-	private function __init(){
-		
+
 	}
 	public function index(){
+		$data = $this->__init();
 		header("HTTP/1.0 404 Not Found");
-		echo '404 not found';
+		$this->setTitle('Not Found'.$this->site_suffix);
+		$this->loadLayout('notfound');
+		$this->render();
 	}
 }

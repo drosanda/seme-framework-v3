@@ -1,14 +1,15 @@
 <?php
-class Home extends SENE_Controller{
-	
+class Home extends JI_Controller{
+
 	public function __construct(){
     parent::__construct();
-	}
-	private function __init(){
-		
+		$this->setTheme('front');
 	}
 	public function index(){
-		echo 'Thankyou for using seme framework';
+		$data = $this->__init();
+
+		$this->loadLayout("col-1",$data);
+		$this->render();
 	}
-  
+
 }
