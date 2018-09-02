@@ -6,10 +6,10 @@
       <table>
         <tr>
           <td rowspan="2">
-            <img src="images/produk/adventure-culture.webp" style="width: 64px;" />
+            <img src="<?=base_url()?>media/products/casual.jpg" style="width: 64px;" />
           </td>
           <th>
-            ADVENTURE CULTURE
+            Casual Tees
           </th>
         </tr>
         <tr>
@@ -35,10 +35,10 @@
       <table>
         <tr>
           <td rowspan="2">
-            <img src="images/produk/re-cycle.webp" style="width: 64px;" />
+            <img src="<?=base_url()?>media/products/chopper-bike.jpg" style="width: 64px;" />
           </td>
           <th>
-            RE CYCLE
+            Chopper Bike
           </th>
         </tr>
         <tr>
