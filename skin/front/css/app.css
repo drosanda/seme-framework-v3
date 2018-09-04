@@ -157,6 +157,23 @@ a:hover,a:focus {
   color: #cfa115;
 }
 
+/*produk*/
+.produk-image-active, .produk-image-hover {
+  width: 100%;
+   transition: opacity .5s linear;
+   -moz-transition: opacity .5s linear;
+   -webkit-transition: opacity .5s linear;
+}
+.row.produk .produk-image-hover {
+  display: none;
+}
+.row.produk:hover .produk-image-hover, .row.produk:focus .produk-image-hover {
+  display: block;
+}
+.row.produk:hover .produk-image-active, .row.produk:focus .produk-image-active {
+  display: none;
+}
+
 /*
 brown color
 */
