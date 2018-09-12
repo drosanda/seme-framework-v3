@@ -7,7 +7,9 @@ class Home extends JI_Controller{
 	}
 	public function index(){
 		$data = $this->__init();
-
+		$this->setTitle('Welcome to DrViCe Clothing - Your Vice Clothes');
+		$this->setDescription('Express yourself with DrVice clothes.');
+		$this->setKeyword('drvice');
 		$this->loadLayout("col-1",$data);
 		$this->render();
 	}

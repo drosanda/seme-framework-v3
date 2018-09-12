@@ -8,6 +8,7 @@ class Notfound extends JI_Controller{
 		$data = $this->__init();
 		header("HTTP/1.0 404 Not Found");
 		$this->setTitle('Not Found'.$this->site_suffix);
+		$this->setDescription('Dr. ViCe Clothing, Your Vice Clothes');
 		$this->loadLayout('notfound');
 		$this->render();
 	}
