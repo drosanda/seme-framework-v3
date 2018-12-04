@@ -66,25 +66,24 @@ if(!is_dir($kerosine_dir)){
 	die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($library_dir)){
-	die("missing library dir:  please create directory in $library_dir");
+	die("missing library dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($config_dir)){
 	die("missing config dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($cache_dir)){
-	die("missing cache dir: please create directory in $cache_dir");
+	die("missing cache dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($model_dir)){
-	die("missing nodel dir: please create directory in $model_dir");
-}
-if(!is_dir($view_dir)){
-	die("missing view dir: please create directory in $view_dir");
-}
+	die("missing nodel dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}if(!is_dir($view_dir)){
+	die("missing view dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+	}
 if(!is_dir($controller_dir)){
-	die("missing controller dir: please create directory in $controller_dir");
+	die("missing controller dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($core_dir)){
-	die("missing core dir: please create directory in $core_dir");
+	die("missing core dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 
 $apps_dir = rtrim($apps_dir, '/').'/';
@@ -121,41 +120,6 @@ define('SENEMODEL',$model_dir);
 define('SENEVIEW',$view_dir);
 define('SENECONTROLLER',$controller_dir);
 define('SENECORE',$core_dir);
-
-if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
-require_once(SENECFG."/config.php");
-
-if(!file_exists(SENECFG."/controller.php")) die('unable to load config file : controller.php');
-require_once(SENECFG."/controller.php");
-
-if(!file_exists(SENECFG."/timezone.php")) die('unable to load config file : timezone.php');
-require_once(SENECFG."/timezone.php");
-
-if(!file_exists(SENECFG."/database.php")) die('unable to load config file : database.php');
-require_once(SENECFG."/database.php");
-
-if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
-require_once(SENECFG."/session.php");
-
-if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
-require_once(SENECFG."/core.php");
-
-if(!isset($default_controller,$notfound_controller)){
-	$default_controller="welcome";
-	$notfound_controller="notfound";
-}
-define("DEFAULT_CONTROLLER",$default_controller);
-define("NOTFOUND_CONTROLLER",$notfound_controller);
-
-if(!isset($site)){
-	die('please fill site url / base url in : '.SENECFG.'config.php. Example: https://www.example.com/');
-}
-define("BASEURL",$site);
-if(!isset($admin_url)){
-	$admin_url=$admin_secret_url;
-}
-define("ADMIN_URL",$admin_url);
-define("WEBSITE_VIEW_ID",$website_view_id);
 
 require_once SENEKEROSINE."/SENE_Engine.php";
 $se = new SENE_Engine($db);
