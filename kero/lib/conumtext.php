@@ -1,7 +1,10 @@
 <?php
 Class Conumtext {
 	private $key='';
-	private $alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+	//private $alpha='YUGieAND1d43ngaWCBLhMubcfjklmopqrstvwxyz2567890EFHIJKOPQRSTVXZ';
+	//private $alpha='6yug13andir0z4m89cefhjklopqstuvwx27b5';
+	//private $alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+	private $alpha='QX2B3C4D5E6F7G8H9I0JKLMNOP1RWAYZSTUV';
 	private $beta='';
 	private $charlie;
 	private $str;

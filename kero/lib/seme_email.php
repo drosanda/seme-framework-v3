@@ -49,7 +49,7 @@ Class Seme_Email {
 	var $body = "";
 	var $eol = PHP_EOL;
 	var $template;
-	
+
 	public function flush(){
 		$this->log = '';
 		$this->to = array();
@@ -74,12 +74,12 @@ Class Seme_Email {
 		}
 		$this->log .= "set from $name $mail".$this->eol;
 	}
-	
+
 	public function replyto($name,$mail){
 		$this->header .= "Reply-To: $name <$mail>".$this->eol;
 		$this->log .= "adding Reply-To $name <$mail>".$this->eol;
 	}
-	
+
 	public function to($mail,$name=""){
 		if(!empty($name)){
 			$this->to[] = $mail;
@@ -91,7 +91,7 @@ Class Seme_Email {
 			$this->log .= "Send to $name $mail".$this->eol;
 		}
 	}
-	
+
 	public function cc($mail){
 		$this->cc[] = $mail;
 		$this->log .= "adding cc $mail".$this->eol;
@@ -101,8 +101,8 @@ Class Seme_Email {
 		$this->bcc[] = $mail;
 		$this->log .= "adding bcc $mail".$this->eol;
 	}
-	
-	
+
+
 	public function subject($subject){
 		$this->subject = $subject;
 		$this->log .= "adding subject $subject".$this->eol;
@@ -117,22 +117,22 @@ Class Seme_Email {
 
 	public function html($html,$type="windows"){
 		if($type=="windows"){
-			$this->body = "Content-Type: text/html; charset=ISO-8859-1".$this->eol;
+			$this->body = "Content-Type: text/html; charset=\"ISO-8859-1\"".$this->eol;
 		}else{
-			$this->body = "Content-Type: text/html; charset=utf-8".$this->eol;
+			$this->body = "Content-Type: text/html; charset=\"utf-8\"".$this->eol;
 		}
 
 		$this->body .= "Content-Transfer-Encoding: quoted-printable".$this->eol;
 		$this->body .= "<html><body>".$this->eol."".$html."".$this->eol."</body></html>".$this->eol;
 		$this->log .= "adding html content \n";
 	}
-	
+
 	public function template($template){
 		$this->log .= "Loading template: ".$template." \n";
 		$basetemp = SENELIB.'/seme_email/';
-		if(!is_dir($basetemp)) mkdir($bastemp);
+		if(!is_dir($basetemp)) mkdir($basetemp);
 		$basetemp = SENELIB.'/seme_email/template/';
-		if(!is_dir($basetemp)) mkdir($bastemp);
+		if(!is_dir($basetemp)) mkdir($basetemp);
 		$ftemp = $basetemp.$template.".php";
 		if(!file_exists($ftemp)){
 			trigger_error("SEME_EMAIL: Template file not found in ".$ftemp);
@@ -140,7 +140,7 @@ Class Seme_Email {
 		}
 		$this->template = $ftemp;
 	}
-	
+
 	public function replacer($replacer,$val=""){
 		$this->log .= "Replacer added. \n";
 		if(is_array($replacer)){
@@ -153,7 +153,7 @@ Class Seme_Email {
 			$this->replacer[$replacer] = $val;
 		}
 	}
-	
+
 	public function send(){
 		if(empty($this->subject)) trigger_error("subject can't empty");
 		$this->log .= "Send triggered \n";
@@ -174,7 +174,8 @@ Class Seme_Email {
 			$this->header .= "".$this->eol;
 		}
 		$this->header .= "MIME-Version: 1.0".$this->eol;
-		$this->header .= "Content-type:text/html;charset=UTF-8".$this->eol;
+		$this->header .= "Content-Type: text/html; charset=\"UTF-8\"".$this->eol;
+		//$this->header .= "Content-Transfer-Encoding: quoted-printable".$this->eol;
 		if(!empty($this->template)){
 			$this->log .= "Template loaded: $this->template  \n";
 			$f = fopen($this->template, 'r');
@@ -191,13 +192,21 @@ Class Seme_Email {
 				}
 			}
 			$this->log .= "inserting template to email OK \n";
+			$message = trim(preg_replace("/\s+/", " ",$message));
+			$message = wordwrap( $message, 75, "\n" );
+			$message = trim($message);
+			//echo '<pre>'.$message.'</pre>';
+			//die();
 			$this->header .= $message;
 		}else{
 			$this->log .= "inserting html body to email OK \n";
-			$this->header .= $this->body;
+			$message = $this->body;
+			$message = trim(preg_replace("/\s+/", " ",$message));
+			$message = wordwrap( $message, 75, "\n" );
+			$message = trim($message);
+			$this->header .= $message;
 		}
 		foreach($this->to as $mail){
-			
 			$res = mail($mail,$this->subject,"",$this->header);
 			if($res){
 				$this->log .= "sending to $mail success".$this->eol;
