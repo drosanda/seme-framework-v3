@@ -1,5 +1,5 @@
 <?php
-//Example 1 column layout
+//Example 3 column layout
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,18 +9,30 @@
   <?php $this->getThemeElement("page/html/topbar",$__forward);?>
   <div class="container">
     <div class="row">
+      <!-- left sidebar-->
+      <div class="col-md-3">
+        <?php $this->getThemeLeftContent(); ?>
+      </div>
+      <!-- end left sidebar-->
+
       <!-- main content-->
-      <div class="col-md-12">
+      <div class="col-md-6">
         <?php $this->getThemeContent(); ?>
       </div>
       <!-- main content-->
+
+      <!-- right sidebar-->
+      <div class="col-md-3">
+        <?php $this->getThemeRightContent(); ?>
+      </div>
+      <!-- end right sidebar-->
     </div>
   </div>
 
   <!--footer-->
   <?php $this->getThemeElement('page/html/footer',$__forward); ?>
   <!--end footer-->
-
+  
   <!-- load JS in footer-->
   <?php $this->getJsFooter(); ?>
   <!-- End load JS in footer-->

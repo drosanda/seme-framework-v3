@@ -1,5 +1,5 @@
 <?php
-class Home extends JI_Controller{
+class Col_2_Right extends JI_Controller{
 
 	public function __construct(){
     parent::__construct();
@@ -12,19 +12,15 @@ class Home extends JI_Controller{
 		$data['brand'] = "SEME Framework";
 
 		//example data passing
-		$data['example'] = 'Lorem lipsum dolor sit amet. This value can be changed in app/controller/home.php';
+		$data['example'] = 'Lorem lipsum dolor sit amet. This value can be change in app/controller/home.php';
 
 		//for set pills active
-		$data['page_current'] = 'col-1';
+		$data['page_current'] = 'col-2-right';
 
 		//this config can be found on app/view/front/page/html/head.php
-		$this->setTitle('Welcome to SEME Framework');
+		$this->setTitle('Example 2 Column');
 		$this->setDescription('SEME Framework PHP MVC Framework with small footprint for your business.');
 		$this->setKeyword('SEME Framework');
-
-		//sidebar left
-		//this view can be found on app/view/front/page/html/sidebar_left.php
-		$this->putThemeLeftContent("page/html/sidebar_left",$data); //pass data to view
 
 		//sidebar right
 		//this view can be found on app/view/front/page/html/sidebar_left.php
@@ -36,7 +32,7 @@ class Home extends JI_Controller{
 		//this view for INPAGE JS Script can be found on app/view/front/page/home/home_bottom.php
 		$this->putJsContent("home/home_bottom",$data); //pass data to view
 
-		$this->loadLayout("col-1",$data);
+		$this->loadLayout("col-2-right",$data);
 		$this->render();
 	}
 

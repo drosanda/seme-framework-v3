@@ -1,5 +1,5 @@
 <?php
-//Example 1 column layout
+//Example 2 column right sidebar layout
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,17 +10,24 @@
   <div class="container">
     <div class="row">
       <!-- main content-->
-      <div class="col-md-12">
+      <div class="col-md-9">
         <?php $this->getThemeContent(); ?>
       </div>
       <!-- main content-->
+
+      <!-- right sidebar-->
+      <div class="col-md-3">
+        <?php $this->getThemeRightContent(); ?>
+      </div>
+      <!-- end right sidebar-->
+
     </div>
   </div>
 
   <!--footer-->
   <?php $this->getThemeElement('page/html/footer',$__forward); ?>
   <!--end footer-->
-
+  
   <!-- load JS in footer-->
   <?php $this->getJsFooter(); ?>
   <!-- End load JS in footer-->

@@ -155,9 +155,6 @@ abstract class SENE_Controller{
 		echo $this->__themeRightContent;
 	}
 	public function getThemeLeftContent(){
-		//echo '<pre>';
-		//var_dump($this->__themeLeftContent);
-		//die('</pre>');
 		echo $this->__themeLeftContent;
 	}
 	public function getJsReady(){
