@@ -27,8 +27,8 @@
           <h1 class="">Insert Method</h1>
 					<p>Insert method is part of database class builder for inserting data into a table.</p>
 					<h2>Parameters</h2>
-					<p>Update method has 2 required parameters that is <b>column name</b> and <b>value</b>, another parameters are optional. Here is the completed parameters can be used by where methods</p>
-					<pre>$this->db->update(string $table_name, array $data_update, [bool $is_debug=0]): bool</pre>
+					<p>Insert method has 2 required parameters that is <b>table name</b> and <b>values</b> in key value format.</p>
+					<pre>$this->db->insert(string $table_name, array $data_insert, [bool $is_multiple=0], [bool $is_debug=0]): bool</pre>
           <h3>$data_insert</h3>
           <p><b>Data insert</b> is key value pair in an array. The key refer to column name of the table.</p>
 					<h2>Example usage</h2>
@@ -42,7 +42,7 @@
 	 parent::__construct();
   }
   public function insert($di){
-    $this->db->update($ths->tbl,$di);
+    $this->db->insert($ths->tbl,$di);
   }
 }</pre>
 					<p>at the controller, we assumed has file named blog.php</p>
@@ -53,11 +53,11 @@
   }
   public function index(){
     $id = 1;
-    $du = array();
-    $du['id'] = 1;
-    $du['title'] = "This is new title of this blog!";
-    $du['content'] = "This is new title of this blog!";
-    $res = $this->bm->update($id,$du); //call the method on the model
+    $di = array();
+    $di['id'] = 1;
+    $di['title'] = "This is new title of this blog!";
+    $di['content'] = "This is new title of this blog!";
+    $res = $this->bm->insert($id,$di); //call the method on the model
     if($res){
       echo 'Success';
     }else{

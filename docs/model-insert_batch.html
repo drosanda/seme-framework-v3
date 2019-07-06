@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Model Group By Method | Seme Framework Documentation</title>
+    <title>Model Insert Batch Method | Seme Framework Documentation</title>
 		<link rel="icon" href="favicon.ico" />
 		<link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="css/foundation.css" />
@@ -20,19 +20,19 @@
           <ul class="breadcrumbs">
             <li class=""><a href="/">Home</a></li>
             <li class=""><a href="/model.html">Model</a></li>
-            <li class="unavailable">Group By Method</li>
+            <li class="unavailable">Insert Multi Method</li>
           </ul>
         </div>
         <div class="large12 columns">
-          <h1 class="">Group By Method</h1>
-					<p>Group By method is part of database class builder for selecting column data into a table.</p>
+          <h1 class="">Insert Batch Method</h1>
+					<p>Insert Batch method is part of database class builder for inserting multiple data into a table. Is alias of <a href="model-insert_multi.html">Insert Multi method</a>.</p>
 					<h2>Parameters</h2>
-					<p>Group By method has 1 required parameters that is <b>column name</b> and <b>value</b>, another parameters are optional. Here is the completed parameters can be used by where methods</p>
-					<pre>$this->db->select(string $column_name): dbObject</pre>
-          <h3>$column_name</h3>
-          <p><b>Column Name</b> can be single column name, or can be filled with wildcard "*".</p>
+          <p>Insert Batch method has 2 required parameters that is <b>table name</b> and <b>values</b> array of array format.</p>
+					<pre>$this->db->insert(string $table_name, array $data_inserts, [bool $is_debug=0]): bool</pre>
+          <h3>$data_inserts</h3>
+          <p><b>Data inserts</b> is key value pair in an array. The key refer to column name of the table.</p>
 					<h2>Example usage</h2>
-					<p>Here is the examples using select method. See the first of this page for full example.</p>
+					<p>Here is the examples using insert multi method. See the first of this page for full example.</p>
           <h3>Basic Usage</h3>
           <p>For example we assumed want to add new data in blog table. First, in the model:</p>
           <pre>class Blog_Model extends SENE_Model{
@@ -41,18 +41,8 @@
   public function __construct(){
 	 parent::__construct();
   }
-  public function getList(){
-    $this->db->select("*");
-    $this->db->from($this->tbl,$this->tbl_as);
-    return $this->db->get();
-  }
-  public function getById($id){
-    $this->db->select("id");
-    $this->db->select("title");
-    $this->db->select("content");
-    $this->db->from($this->tbl,$this->tbl_as);
-    $this->db->where_as("id",$id);
-    return $this->db->get_first();
+  public function inserts($dis){
+    $this->db->insert_multi($ths->tbl,$dis);
   }
 }</pre>
 					<p>at the controller, we assumed has file named blog.php</p>
@@ -62,12 +52,27 @@
     $this->load('blog_model','bm'); #class scope model
   }
   public function index(){
-    $blogs = $this->bm->getList();
-    $this->debug($blogs);
-  }
-  public function detail($id){
-    $blog = $this->bm->getById($id);
-    $this->debug($blog);
+    $id = 1;
+    $di = array();
+
+    $dis = array();
+    $dis['id'] = 1;
+    $dis['title'] = "This is new title of this blog!";
+    $dis['content'] = "This is new title of this blog!";
+    $di[]=$dis;
+
+    $dis = array();
+    $dis['id'] = 2;
+    $dis['title'] = "Test multiple insert";
+    $dis['content'] = "This is new test for multiple insert";
+    $di[]=$dis;
+
+    $res = $this->bm->inserts($id,$dis); //call the method on the model
+    if($res){
+      echo 'Success';
+    }else{
+      echo 'failed';
+    }
   }
 }</pre>
         </div>
