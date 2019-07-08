@@ -1,46 +1,5 @@
 <?php
-DEFINE('SENE_VERSION','3.1');
-if(!isset($_SERVER))$_SERVER = array();
-if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
-if(!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI'] = '/';
-if(!isset($_SERVER['DOCUMENT_ROOT'])) $_SERVER['DOCUMENT_ROOT'] = __DIR__;
-
-if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
-require_once(SENECFG."/config.php");
-
-if(!file_exists(SENECFG."/controller.php")) die('unable to load config file : controller.php');
-require_once(SENECFG."/controller.php");
-
-if(!file_exists(SENECFG."/timezone.php")) die('unable to load config file : timezone.php');
-require_once(SENECFG."/timezone.php");
-
-if(!file_exists(SENECFG."/database.php")) die('unable to load config file : database.php');
-require_once(SENECFG."/database.php");
-
-if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
-require_once(SENECFG."/session.php");
-
-if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
-require_once(SENECFG."/core.php");
-
-if(!isset($site)){
-	die('please fill site url / base url in : '.SENECFG.'config.php. Example: https://www.example.com/');
-}
-define("BASEURL",$site);
-if(!isset($admin_url)){
-	$admin_url=$admin_secret_url;
-}
-define("ADMIN_URL",$admin_url);
-define("WEBSITE_VIEW_ID",$website_view_id);
-
-if(!isset($default_controller,$notfound_controller)){
-	$default_controller="welcome";
-	$notfound_controller="notfound";
-}
-define("DEFAULT_CONTROLLER",$default_controller);
-define("NOTFOUND_CONTROLLER",$notfound_controller);
-
-$routing = array();
+DEFINE('SENE_VERSION','3.0');
 
 class SENE_Engine{
   protected static $__instance;
@@ -73,21 +32,7 @@ class SENE_Engine{
 			$rs[$key] = $val;
 		}
 		$this->routes = $rs;
-		$sene_method = $GLOBALS['sene_method'];
-		if(isset($_SERVER['argv'])){
-			if(count($_SERVER['argv'])>1){
-				$i=0;
-				$_SERVER[$sene_method] = '';
-				foreach($_SERVER['argv'] as $argv){
-					$i++;
-					if($i==1) continue;
-					$_SERVER[$sene_method] .= '/'.$argv;
-				}
-				unset($i);
-				unset($argv);
-			}
-		}
-		unset($sene_method);
+
 	}
   public static function getInstance(){
     return self::$_instance;
@@ -179,18 +124,22 @@ class SENE_Engine{
 		$found=0;
 		$sene_method = $GLOBALS['sene_method'];
 		if(isset($_SERVER[$sene_method])){
-			$path=$_SERVER[$sene_method];
-			$path = parse_url($path, PHP_URL_PATH);
-			$path=explode("/",$path);
+			$path = $_SERVER[$sene_method];
+      $path = str_replace("//","/",$path);
+			$path = explode("/",str_replace("//","/",$path));
 			$i=0;
 			foreach($path as $p){
-				if(strlen($p)==0) unset($path[$i]);
+				if(strlen($p)>0){
+					$pos = strpos($p, '?');
+					if ($pos !== false) {
+						//echo "pos: ".$pos;
+						unset($path[$i]);
+					}
+				}
 				$i++;
 			}
 			unset($p);
 			$path = $this->ovrRoutes($path);
-			if(!isset($path[0])) $path[0] = '';
-			if(!isset($path[1])) $path[1] = '';
 			$path[1] = str_replace('-','_',$path[1]);
 			if((!empty($path[1]))){
 				if($path[1] == "admin" && $this->admin_url !="admin"){
@@ -780,7 +729,7 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
 	$backtraces = debug_backtrace();
 	$bct = array();
 	$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
-	
+
 	$ef = explode('/',str_replace('\\','/',$error_file));
 	if(isset($ef[count($ef)-1])) $ef = $ef[count($ef)-1];
 	if(in_array(strtolower($ef),$fls)){
@@ -808,7 +757,7 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
 		$error_file = $bcts[0]['file'];
 		$error_line = $bcts[0]['line'];
 	}
-	
+
 	echo '<div style="padding: 10px; background-color: #ededed;">';
 	echo '<h2 style="color: #ef0000;">Error</h2>';
 	echo '<p>File: '.$error_file.'</p>';
@@ -826,13 +775,13 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
 		if(!isset($e['file'])) continue;
 		echo '<p><b>File</b>: '.$e['file'].'</p>';
 		echo '<p><b>Line</b>: '.$e['line'].'</p>';
-		if(isset($e['class'])){ 
+		if(isset($e['class'])){
 			echo '<p><b>Class</b>: '.$e['class'].'</p>';
 			echo '<p><b>Method</b>: '.$e['function'].'</p>';
 		}else{
 			echo '<p><b>Function</b>: '.$e['function'].'</p>';
 		}
-		
+
 		echo '<hr>';
 	}
 	echo '</div>';

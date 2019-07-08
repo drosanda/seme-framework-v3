@@ -2,7 +2,7 @@
 abstract class SENE_Model {
 	protected $db;
 	public $field = array();
-	
+
 	public function __construct(){
 		$db=$GLOBALS['db'];
 		$this->loadEngine($db);
@@ -23,12 +23,12 @@ abstract class SENE_Model {
 		// $this->field = $this->engine->getField();
 		return $this->db->exec($sql);
 	}
-	
+
 	public function multiExec($sql){
 		// $this->field = $this->engine->getField();
 		$res = $this->db->multiExec($sql);
 	}
-	
+
 	public function select($sql,$cache_engine=0,$flushcache=0,$tipe="object"){
 	//die($tipe);
 		return $this->db->select($sql,$cache_engine,$flushcache,$tipe);
@@ -48,7 +48,7 @@ abstract class SENE_Model {
 		}
 		return $name;
 	}
-	
+
 	public function filter(&$str){
 		$str=filter_var($str,FILTER_SANITIZE_SPECIAL_CHARS);
 	}
