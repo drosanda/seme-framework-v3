@@ -3,7 +3,7 @@ abstract class SENE_Model{
 	protected $koneksi;
 	private $fieldname = array();
 	private $fieldvalue = array();
-	
+
 	function __construct(){
 		$this->koneksi=koneksi_db();
 	}
