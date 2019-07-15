@@ -17,6 +17,7 @@ class Home extends JI_Controller{
 		//for set pills active
 		$data['page_current'] = 'col-1';
 
+
 		//this config can be found on app/view/front/page/html/head.php
 		$this->setTitle('Welcome to SEME Framework');
 		$this->setDescription('SEME Framework PHP MVC Framework with small footprint for your business.');
