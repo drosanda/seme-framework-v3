@@ -658,4 +658,5 @@ class SENE_Input{
 			return 0;
 		}
 	}
+
 }

@@ -18,7 +18,6 @@ class SENE_Engine{
 		if($GLOBALS['core_controller']) if(!empty($GLOBALS['core_controller'])) $this->core_controller = $GLOBALS['core_controller'];
 		if($GLOBALS['core_model']) if(!empty($GLOBALS['core_model'])) $this->core_model = $GLOBALS['core_model'];
 
-
 		$this->admin_url=ADMIN_URL;
 		self::$__instance = $this;
 
@@ -32,6 +31,21 @@ class SENE_Engine{
 		}
 		$this->routes = $rs;
 
+		$sene_method = $GLOBALS['sene_method'];
+		if(isset($_SERVER['argv'])){
+			if(count($_SERVER['argv'])>1){
+				$i=0;
+				$_SERVER[$sene_method] = '';
+				foreach($_SERVER['argv'] as $argv){
+					$i++;
+					if($i==1) continue;
+					$_SERVER[$sene_method] .= '/'.$argv;
+				}
+				unset($i);
+				unset($argv);
+			}
+		}
+		unset($sene_method);
 	}
   public static function getInstance(){
     return self::$_instance;
@@ -202,6 +216,7 @@ class SENE_Engine{
 										}
 									}
 								}
+                $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 								$reflection->invokeArgs($cname,$args);
 							}else{
 								$this->notFound($newpath);
@@ -243,6 +258,7 @@ class SENE_Engine{
 									}
 								}
 							}
+              $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 							$reflection->invokeArgs($cname,$args);
 						}else{
 							$this->notFound($newpath);
@@ -284,6 +300,7 @@ class SENE_Engine{
 										}
 									}
 								}
+                $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 								$reflection->invokeArgs($cname,$args);
 							}else{
 

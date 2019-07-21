@@ -40,5 +40,4 @@ class Home extends JI_Controller{
 		$this->loadLayout("col-1",$data);
 		$this->render();
 	}
-
 }

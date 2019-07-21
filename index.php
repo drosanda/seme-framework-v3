@@ -121,6 +121,7 @@ if(!defined('SENEVIEW')) define('SENEVIEW',$view_dir);
 if(!defined('SENECONTROLLER')) define('SENECONTROLLER',$controller_dir);
 if(!defined('SENECORE')) define('SENECORE',$core_dir);
 
+if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
 if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
 require_once(SENECFG."/config.php");
 $GLOBALS['sene_method'] = $sene_method;
