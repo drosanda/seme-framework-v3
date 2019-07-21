@@ -123,6 +123,7 @@ if(!defined('SENECORE')) define('SENECORE',$core_dir);
 
 if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
 require_once(SENECFG."/config.php");
+$GLOBALS['sene_method'] = $sene_method;
 
 if(!file_exists(SENECFG."/controller.php")) die('unable to load config file : controller.php');
 require_once(SENECFG."/controller.php");
@@ -135,9 +136,14 @@ require_once(SENECFG."/database.php");
 
 if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
 require_once(SENECFG."/session.php");
+if(!defined('SALTKEY')) define('SALTKEY',$saltkey);
 
 if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
 require_once(SENECFG."/core.php");
+
+$GLOBALS['core_prefix'] = $core_prefix;
+$GLOBALS['core_controller'] = $core_controller;
+$GLOBALS['core_model'] = $core_model;
 
 if(!isset($default_controller,$notfound_controller)){
 	$default_controller="welcome";
@@ -158,7 +164,6 @@ if(!defined('WEBSITE_VIEW_ID')) define("WEBSITE_VIEW_ID",$website_view_id);
 
 $routing = array();
 
-
 require_once SENEKEROSINE."/SENE_Engine.php";
-$se = new SENE_Engine($db);
+$se = new SENE_Engine();
 $se->SENE_Engine();
