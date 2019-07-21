@@ -4,9 +4,4 @@
     <server name='HTTP_HOST' value='http://localhost' />
     <server name='SEME_ERR_BYPASS' value='1' />
   </php>
-  <testsuites>
-    <testsuite name="Project Test Suite">
-      <file>app/controller/example/home.php</file>
-    </testsuite>
-  </testsuites>
 </phpunit>
