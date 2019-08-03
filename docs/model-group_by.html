@@ -28,11 +28,11 @@
 					<p>Group By method is part of database class builder for selecting column data into a table.</p>
 					<h2>Parameters</h2>
 					<p>Group By method has 1 required parameters that is <b>column name</b> and <b>value</b>, another parameters are optional. Here is the completed parameters can be used by where methods</p>
-					<pre>$this->db->select(string $column_name): dbObject</pre>
-          <h3>$column_name</h3>
-          <p><b>Column Name</b> can be single column name, or can be filled with wildcard "*".</p>
+					<pre>$this->db->group_by(string $condition): dbObject</pre>
+          <h3>$condition</h3>
+          <p><b>Condition</b> can be single column name or can be SQL Function.</p>
 					<h2>Example usage</h2>
-					<p>Here is the examples using select method. See the first of this page for full example.</p>
+					<p>Here is the examples using group_by method. See the first of this page for full example.</p>
           <h3>Basic Usage</h3>
           <p>For example we assumed want to add new data in blog table. First, in the model:</p>
           <pre>class Blog_Model extends SENE_Model{
@@ -41,18 +41,12 @@
   public function __construct(){
 	 parent::__construct();
   }
-  public function getList(){
-    $this->db->select("*");
+  public function countByCategory(){
+    $this->db->select_as("COUNT(*)",'total',0);
+    $this->db->select_as("category",'category',0);
     $this->db->from($this->tbl,$this->tbl_as);
+    $this->db->group_by("category");
     return $this->db->get();
-  }
-  public function getById($id){
-    $this->db->select("id");
-    $this->db->select("title");
-    $this->db->select("content");
-    $this->db->from($this->tbl,$this->tbl_as);
-    $this->db->where_as("id",$id);
-    return $this->db->get_first();
   }
 }</pre>
 					<p>at the controller, we assumed has file named blog.php</p>
@@ -62,19 +56,15 @@
     $this->load('blog_model','bm'); #class scope model
   }
   public function index(){
-    $blogs = $this->bm->getList();
+    $blogs = $this->bm->countByCategory();
     $this->debug($blogs);
-  }
-  public function detail($id){
-    $blog = $this->bm->getById($id);
-    $this->debug($blog);
   }
 }</pre>
         </div>
       </div>
       <div class="row footer">
         <div class="large-12 columns">
-          <p class="">Copyright &copy; 2014-2019, Daeng Rosanda, S.Kom. Last updated on 07 Juli 2019.</p>
+          <p class="">Copyright &copy; 2014-2019, Daeng Rosanda, S.Kom. Last updated on 04 Agustus 2019.</p>
         </div>
       </div>
     </div>
