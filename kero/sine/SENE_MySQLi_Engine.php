@@ -631,7 +631,7 @@ class SENE_MySQLi_Engine{
 				}
 				$this->in_where .= "".$k."";
 				unset($kst);
-				
+
 				$this->in_where .= " ".$c." ".$val."";
 				if($bracket2){
 					$this->in_where .= " ) ";
@@ -767,9 +767,9 @@ class SENE_MySQLi_Engine{
 				$this->in_where .= " ) ";
 			}
 			$this->in_where .=  " ".$operand." ";
-			
+
 			$this->in_where = trim($this->in_where,"=");
-			
+
 			unset($c);
 			unset($v);
 			unset($k);
@@ -1044,8 +1044,8 @@ class SENE_MySQLi_Engine{
 			trigger_error($this->__mysqli->error);
 		}
 	}
-	public function insert_batch($table,$datas,$is_debug=0){
-		$this->insert_multi($table,$datas=array(),$is_debug=0);
+	public function insert_batch($table,$datas=array(),$is_debug=0){
+		$this->insert_multi($table,$datas,$is_debug);
 	}
 	public function insert_multi($table,$datas=array(),$is_debug=0){
 		//$multi_array=0;
@@ -1240,7 +1240,7 @@ class SENE_MySQLi_Engine{
 
 			$this->join[$this->in_join] = $join;
 			$this->in_join = $this->in_join+1;
-		
+
 		return $this;
 	}
 	public function between($key,$val1,$val2,$is_not=0){

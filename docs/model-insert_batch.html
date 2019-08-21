@@ -20,12 +20,12 @@
           <ul class="breadcrumbs">
             <li class=""><a href="/">Home</a></li>
             <li class=""><a href="/model.html">Model</a></li>
-            <li class="unavailable">Insert Multi Method</li>
+            <li class="unavailable">Insert Batch Method</li>
           </ul>
         </div>
         <div class="large12 columns">
           <h1 class="">Insert Batch Method</h1>
-					<p>Insert Batch method is part of database class builder for inserting multiple data into a table. Is alias of <a href="model-insert_multi.html">Insert Multi method</a>.</p>
+					<p>Insert Batch method is alias of insert_multi method. Insert batch is part of database class builder for inserting multiple data into a table. Is alias of <a href="model-insert_multi.html">Insert Multi method</a>.</p>
 					<h2>Parameters</h2>
           <p>Insert Batch method has 2 required parameters that is <b>table name</b> and <b>values</b> array of array format.</p>
 					<pre>$this->db->insert(string $table_name, array $data_inserts, [bool $is_debug=0]): bool</pre>
@@ -42,7 +42,7 @@
 	 parent::__construct();
   }
   public function inserts($dis){
-    $this->db->insert_multi($ths->tbl,$dis);
+    $this->db->insert_batch($ths->tbl,$dis);
   }
 }</pre>
 					<p>at the controller, we assumed has file named blog.php</p>
@@ -79,7 +79,7 @@
       </div>
       <div class="row footer">
         <div class="large-12 columns">
-          <p class="">Copyright &copy; 2014-2019, Daeng Rosanda, S.Kom. Last updated on 07 Juli 2019.</p>
+          <p class="">Copyright &copy; 2014-2019, Daeng Rosanda, S.Kom. Last updated on 21 Agutstus 2019.</p>
         </div>
       </div>
     </div>

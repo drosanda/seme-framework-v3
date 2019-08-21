@@ -42,7 +42,7 @@
 	 parent::__construct();
   }
   public function inserts($dis){
-    $this->db->insert_batch($ths->tbl,$dis);
+    $this->db->insert_multi($ths->tbl,$dis);
   }
 }</pre>
 					<p>at the controller, we assumed has file named blog.php</p>
@@ -79,7 +79,7 @@
       </div>
       <div class="row footer">
         <div class="large-12 columns">
-          <p class="">Copyright &copy; 2014-2019, Daeng Rosanda, S.Kom. Last updated on 07 Juli 2019.</p>
+          <p class="">Copyright &copy; 2014-2019, Daeng Rosanda, S.Kom. Last updated on 21 Agustus 2019.</p>
         </div>
       </div>
     </div>
