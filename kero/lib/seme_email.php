@@ -52,6 +52,7 @@ Class Seme_Email {
 
 	public function flush(){
 		$this->log = '';
+		$this->header = "";
 		$this->to = array();
 		$this->toname = array();
 		$this->cc = array();
@@ -214,6 +215,7 @@ Class Seme_Email {
 				$this->log .= "sending to $mail failed".$this->eol;
 			}
 			$this->log .= "\n";
+			$this->flush();
 		}
 	}
 	public function getLog(){
