@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Seme Log - Library | Seme Framework Documentation</title>
-		<link rel="icon" href="favicon.ico" />
+    <meta name="description" content="Seme Log library documentation for Seme Framework"/>
+    <meta name="author" content="drosanda"/>
+    <link rel="icon" href="favicon.ico" />
 		<link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="css/foundation.css" />
     <script src="js/vendor/modernizr.js"></script>
@@ -19,7 +21,7 @@
         <div class="large12 columns">
           <ul class="breadcrumbs">
             <li class=""><a href="/">Home</a></li>
-            <li class=""><a href="lirary.html">Library</a></li>
+            <li class=""><a href="library.html">Library</a></li>
             <li class="unavailable">Seme Log</li>
           </ul>
         </div>
@@ -38,7 +40,7 @@
     $this->lib('seme_log');
   }
   public function index(){
-    $this->seme_log->write("Produk::index called")
+    $this->seme_log->write("Produk::index called");
   }
 }</pre>
           <p>And then this is the result if we open file seme.log</p>
