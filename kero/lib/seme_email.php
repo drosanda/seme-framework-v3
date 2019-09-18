@@ -63,6 +63,7 @@ Class Seme_Email {
 		$this->subject = '';
 		$this->body = '';
 		$this->template = '';
+		$this->log = "Seme_Email: Flush Successfully".$this->eol;
 	}
 	public function from($mail,$name=""){
 		$this->boundary = md5(uniqid(time()));
@@ -154,6 +155,27 @@ Class Seme_Email {
 			$this->replacer[$replacer] = $val;
 		}
 	}
+	public function attachment_clear(){
+		$this->attachment = array();
+	}
+	public function attachment_add($filepath,$filename=""){
+		if(is_file($filepath)){
+			$a = new stdClass();
+			$a->pathinfo = pathinfo($filepath);
+			$a->basename = $a->pathinfo['basename'];
+			if(strlen($filename)>3) $a->basename = $filename;
+
+			//read file
+			$a->filesize = filesize($filepath);
+			$fh = fopen($filepath,"r");
+		 	$a->content = fread($fh,$a->filesize);
+			$a->chunked = chunk_split(base64_encode($a->content));
+			$a->mime = mime_content_type($filepath);
+		 	fclose($fh);
+			$this->attachment[] = $a;
+			unset($a);
+		}
+	}
 
 	public function send(){
 		if(empty($this->subject)) trigger_error("subject can't empty");
@@ -175,7 +197,20 @@ Class Seme_Email {
 			$this->header .= "".$this->eol;
 		}
 		$this->header .= "MIME-Version: 1.0".$this->eol;
-		$this->header .= "Content-Type: text/html; charset=\"UTF-8\"".$this->eol;
+		$uid = '';
+		$atc = count($this->attachment);
+		if($atc){
+			$this->body = '';
+			$uid = md5(uniqid(time()));
+			$this->header .= "Content-Type: multipart/mixed; boundary=\"$uid\"".$this->eol;
+			$this->body .= "--$uid".$this->eol;
+			$this->body .= "Content-Type: text/html; charset=\"UTF-8\"".$this->eol;
+			$this->body .= "Content-Transfer-Encoding: 8bit".$this->eol.$this->eol;
+		}else{
+			$this->header .= "Content-Type: text/html; charset=\"UTF-8\"".$this->eol;
+		}
+
+		//if($atc) $this->header .= "Content-Transfer-Encoding: 8bit".$this->eol;
 		//$this->header .= "Content-Transfer-Encoding: quoted-printable".$this->eol;
 		if(!empty($this->template)){
 			$this->log .= "Template loaded: $this->template  \n";
@@ -183,7 +218,7 @@ Class Seme_Email {
 			$message = fread($f, filesize($this->template));
 			fclose($f);
 			if(strlen($message)<2){
-				trigger_error("SEME_MAILGUN: Message too short, please provide more");
+				trigger_error("SEME_EMAIL: Message too short, please provide more");
 				die();
 			}
 			if(count($this->replacer)>0){
@@ -196,26 +231,68 @@ Class Seme_Email {
 			$message = trim(preg_replace("/\s+/", " ",$message));
 			$message = wordwrap( $message, 75, "\n" );
 			$message = trim($message);
-			//echo '<pre>'.$message.'</pre>';
-			//die();
-			$this->header .= $message;
+
+			if($atc){
+				$this->body .= $message.$this->eol;
+			}else{
+				$this->header .= $message;
+			}
+			foreach($this->attachment as $a){
+				$this->body .= "--$uid".$this->eol;
+				$this->body .= "Content-Type: \"$a->mime\"; name=\"$a->basename\"".$this->eol;
+				$this->body .= "Content-Transfer-Encoding: base64".$this->eol;
+				$this->body .= "Content-Disposition: attachment; filename=\"$a->basename\"".$this->eol;
+				$this->body .= $this->eol.$a->chunked.$this->eol;
+				$this->log .= "attached: $a->basename -> $a->filesize bytes \n";
+			}
+			if($atc) $this->body .= "--$uid--";
 		}else{
-			$this->log .= "inserting html body to email OK \n";
+			$this->log .= "inserting plain body to email OK \n";
 			$message = $this->body;
 			$message = trim(preg_replace("/\s+/", " ",$message));
-			$message = wordwrap( $message, 75, "\n" );
+			$message = wordwrap($message,75,"\n");
 			$message = trim($message);
-			$this->header .= $message;
+
+			$atc = count($this->attachment);
+			if($atc){
+				$this->body = '';
+				$uid = md5(uniqid(time()));
+				$this->header .= "Content-Type: multipart/mixed; boundary=\"$uid\"".$this->eol;
+				$this->body .= "--$uid".$this->eol;
+				$this->body .= "Content-Type: text/plain; charset=\"iso-8859-1\"".$this->eol;
+				$this->body .= "Content-Transfer-Encoding: 7bit".$this->eol;
+				$this->body .= $message.$this->eol;
+				foreach($this->attachment as $a){
+					$this->body .= "--$uid".$this->eol;
+					$this->body .= "Content-Type: \"$a->mime\"; name=\"$a->basename\"".$this->eol;
+					$this->body .= "Content-Transfer-Encoding: base64".$this->eol;
+					$this->body .= "Content-Disposition: attachment; filename=\"$a->basename\"".$this->eol;
+					$this->body .= $this->eol.$a->chunked.$this->eol;
+					$this->log .= "attached: $a->basename -> $a->filesize bytes \n";
+				}
+				if($atc) $this->body .= "--$uid--";
+			}else{
+				$this->header .= "Content-Type: text/plain; charset=\"iso-8859-1\"".$this->eol;
+				$this->header .= $message;
+			}
 		}
+		//echo '<br /><pre>';
+		//print_r($this->header);
+		//print_r($this->body);
+		//die();
+
 		foreach($this->to as $mail){
-			$res = mail($mail,$this->subject,"",$this->header);
+			if($atc){
+				$res = mail($mail,$this->subject,$this->body,$this->header);
+			}else{
+				$res = mail($mail,$this->subject,"",$this->header);
+			}
 			if($res){
 				$this->log .= "sending to $mail success".$this->eol;
 			}else{
 				$this->log .= "sending to $mail failed".$this->eol;
 			}
 			$this->log .= "\n";
-			$this->flush();
 		}
 	}
 	public function getLog(){
