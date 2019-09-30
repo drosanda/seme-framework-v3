@@ -96,24 +96,13 @@ class SENE_MySQLi_Engine{
 			return 0;
 		}
 	}
-	public function select_as($skey,$sval="",$escape=1){
-		if(empty($escape)){
-			if(is_array($skey)){
-				foreach($skey as $k=>$v){
-					$this->in_select .= "".$k." '".$v."', ";
-				}
-			}else{
-				$this->in_select .= "".$skey." AS '".$sval."', ";
+	public function select_as($skey,$sval=""){
+		if(is_array($skey)){
+			foreach($skey as $k=>$v){
+				$this->in_select .= "".$k." '".$v."', ";
 			}
 		}else{
-			if(is_array($skey)){
-				foreach($skey as $k=>$v){
-					$this->in_select .= "`".$k."` AS '".$v."', ";
-				}
-			}else{
-				$this->in_select .= "`".$skey."` AS '".$sval."', ";
-			}
-
+			$this->in_select .= "".$skey." AS '".$sval."', ";
 		}
 		return $this;
 	}
