@@ -1,5 +1,5 @@
 <?php
-class Home extends JI_Controller{
+class Tentang extends JI_Controller{
 
 	public function __construct(){
     parent::__construct();
@@ -25,11 +25,11 @@ class Home extends JI_Controller{
 
 		//main content
 		//this view can be found on app/view/front/home/home.php
-		$this->putThemeContent("home/home",$data); //pass data to view
+		$this->putThemeContent("tentang/home",$data); //pass data to view
 		//this view for INPAGE JS Script can be found on app/view/front/page/home/home_bottom.php
-		$this->putJsContent("home/home_bottom",$data); //pass data to view
+		$this->putJsContent("tentang/home_bottom",$data); //pass data to view
 
-		$this->loadLayout("col-2-left",$data);
+		$this->loadLayout("col-1",$data);
 		$this->render();
 	}
 }

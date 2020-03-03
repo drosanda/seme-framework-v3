@@ -7,7 +7,7 @@
 <?php $this->getBodyBefore(); ?>
 <body class="">
   <?php $this->getThemeElement("page/html/topbar",$__forward);?>
-  <div class="container">
+  <div class="container" style="background-image: url('<?=base_url('media/sliders/nikah.jpg')?>');">
     <div class="row">
       <!-- main content-->
       <div class="col-md-12">
