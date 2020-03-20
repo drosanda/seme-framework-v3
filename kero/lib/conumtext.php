@@ -1,10 +1,7 @@
 <?php
 Class Conumtext {
 	private $key='';
-	//private $alpha='YUGieAND1d43ngaWCBLhMubcfjklmopqrstvwxyz2567890EFHIJKOPQRSTVXZ';
-	//private $alpha='6yug13andir0z4m89cefhjklopqstuvwx27b5';
-	//private $alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-	private $alpha='QX2B3C4D5E6F7G8H9I0JKLMNOP1RWAYZSTUV';
+	private $alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 	private $beta='';
 	private $charlie;
 	private $str;
@@ -53,15 +50,14 @@ Class Conumtext {
 			$min=0;
 			if(empty($max)) $max=9;
 			for($i=0;$i<=$min;$i++){
-				$x = rand($min,($max-1));
+				$x = mt_rand($min,($max-1));
 				$str .= $x;
 			}
 		}else{
 			$alpha = $this->alpha;
 			if(empty($max)) $max = strlen($alpha);
-
 			for($i=0;$i<=$min;$i++){
-				$x = rand(0,($max-1));
+				$x = mt_rand(0,($max-1));
 				$str .= $alpha{$x};
 			}
 		}
