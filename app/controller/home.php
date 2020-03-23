@@ -7,7 +7,20 @@ class Home extends JI_Controller{
 	}
 	public function index(){
 		$data = $this->__init(); //method from app/core/ji_controller
-
+		
+		$this->load("b_user_model","bum");
+		
+		$di = [
+			"namax"=>'daeng'
+		];
+		//$this->bum->setDebug(1);
+		$res = $this->bum->set($di);
+		if($res){
+			echo 'Berhasil';
+		}else{
+			echo 'Gagal';
+		}
+		die();
 
 
 		//this config can be found on app/view/front/page/html/head.php
@@ -29,7 +42,7 @@ class Home extends JI_Controller{
 		//this view for INPAGE JS Script can be found on app/view/front/page/home/home_bottom.php
 		$this->putJsContent("home/home_bottom",$data); //pass data to view
 
-		$this->loadLayout("col-2-left",$data);
+		$this->loadLayout("col-1",$data);
 		$this->render();
 	}
 }

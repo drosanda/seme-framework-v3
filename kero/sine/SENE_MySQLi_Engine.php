@@ -27,6 +27,7 @@ class SENE_MySQLi_Engine{
 	var $join_multi=0;
 	var $in_join_multi=0;
 	var $query_last;
+	var $is_debug;
 
 	function __construct(){
 		$db = $GLOBALS['db'];
@@ -65,6 +66,7 @@ class SENE_MySQLi_Engine{
 		$this->join = array();
 		$this->join_multi = array();
 		$this->query_last = "";
+		$this->is_debug = 0;
 	}
   public static function getInstance(){
     return self::$_instance;
@@ -97,8 +99,9 @@ class SENE_MySQLi_Engine{
 		if($res){
 			return 1;
 		}else{
-			//$this->debug($sql);
-			//trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+			if($this->is_debug){
+				trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+			}
 			return 0;
 		}
 	}
@@ -1489,5 +1492,13 @@ class SENE_MySQLi_Engine{
 	}
 	public function getLastQuery(){
 		return $this->query_last;
+	}
+	public function setDebug($is_debug){
+		if(!empty($is_debug)){
+			$this->is_debug = 1;
+		}else{
+			$this->is_debug = 0;
+		}
+		return $this;
 	}
 }

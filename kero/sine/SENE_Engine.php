@@ -1,5 +1,5 @@
 <?php
-DEFINE('SENE_VERSION','3.2');
+DEFINE('SENE_VERSION','3.2.1');
 
 class SENE_Engine{
   protected static $__instance;

@@ -48,8 +48,10 @@ abstract class SENE_Model {
 		}
 		return $name;
 	}
-
 	public function filter(&$str){
 		$str=filter_var($str,FILTER_SANITIZE_SPECIAL_CHARS);
+	}
+	public function setDebug($is_debug){
+		return $this->db->setDebug($is_debug);
 	}
 }
