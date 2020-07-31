@@ -11,9 +11,17 @@ This framework suitable for Programmer that only know about Manual way of code. 
  - Admin Friendly. Seme Framework has re-routing feature for admin page, without refactoring the MVC.
  - Theme Engine. Seme Framework has feature who can PUSH the content inside the layout view. Also support theming engine, if you want change the Style, you just clone the original one and modified safely.
 
-## Version 3.0
-On version 3.0 we have plan to do more with aliases in models and then we have more homework to rebalancing query builder (query helper) method.
-Adding library for using mailgun
+## Versions
+Here is list of versions available to Seme framework
+
+### Versions 3.3.0
+Add namespace for Core logic. Model class has been chaned to \Kero\Sine\Model.
+
+### 3.2.1
+On version 3.2.1 we have improved some codes and its docs.
+
+### 3.0.x - 3.1.x
+On version 3.0.x - 3.1.x we have plan to do more with aliases in models and then we have more homework to rebalancing query builder (query helper) method.
 
 ## Basic Concept
 Seme Framework comes with basic routing and database that supported MySQL or MariaDB.
