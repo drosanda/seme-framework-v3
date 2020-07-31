@@ -1,7 +1,10 @@
 <?php
+namespace Kero\Sine;
+
 DEFINE('SENE_VERSION','3.2.1');
 
-class SENE_Engine{
+
+class Engine {
   protected static $__instance;
 
 	var $admin_url="";
@@ -13,7 +16,7 @@ class SENE_Engine{
 	var $routes;
 	public function __construct(){
 		require_once SENEKEROSINE."/SENE_Controller.php";
-		require_once SENEKEROSINE."/SENE_Model.php";
+		require_once SENEKEROSINE."/Model.php";
 		if(isset($GLOBALS['core_prefix'])) if(!empty($GLOBALS['core_prefix'])) $this->core_prefix = $GLOBALS['core_prefix'];
 		if($GLOBALS['core_controller']) if(!empty($GLOBALS['core_controller'])) $this->core_controller = $GLOBALS['core_controller'];
 		if($GLOBALS['core_model']) if(!empty($GLOBALS['core_model'])) $this->core_model = $GLOBALS['core_model'];
@@ -46,11 +49,12 @@ class SENE_Engine{
 			}
 		}
 		unset($sene_method);
+
 	}
   public static function getInstance(){
     return self::$_instance;
   }
-	public function SENE_Engine(){
+	public function Engine(){
 		$core_controller_file = SENECORE.$this->core_prefix.$this->core_controller.'.php';
 		$core_model_file = SENECORE.$this->core_prefix.$this->core_model.'.php';
 
@@ -76,7 +80,10 @@ class SENE_Engine{
 		}
 
 		$this->newRouteFolder();
-		//$this->newRouteFolder2();
+    unset($this->core_prefix);
+    unset($this->core_model);
+    unset($core_controller_file);
+    unset($core_model_file);
 	}
 	private function defaultController(){
 		$cname = $this->default."";
@@ -104,11 +111,11 @@ class SENE_Engine{
 			if(is_file($filename) && !empty($slug_parent)){
 				require_once $filename;
 				$cname = basename($filename, ".php");
-				$cname = str_replace('-','_',$cname);
+				$cname = strtr($cname,'-','_');;
 				if(class_exists($cname)){
 					$cname = new $cname();
 					$func = "slugParent";
-					$reflection = new ReflectionMethod($cname, $func);
+					$reflection = new \ReflectionMethod($cname, $func);
 					$args = array();
 					$args[0] = $slug_parent;
 					$args[1] = $slug_child;
@@ -138,14 +145,13 @@ class SENE_Engine{
 		$sene_method = $GLOBALS['sene_method'];
 		if(isset($_SERVER[$sene_method])){
 			$path = $_SERVER[$sene_method];
-      $path = str_replace("//","/",$path);
+      $path = strtr($path,'//','/');
 			$path = explode("/",str_replace("//","/",$path));
 			$i=0;
 			foreach($path as $p){
 				if(strlen($p)>0){
 					$pos = strpos($p, '?');
 					if ($pos !== false) {
-						//echo "pos: ".$pos;
 						unset($path[$i]);
 					}
 				}
@@ -153,7 +159,8 @@ class SENE_Engine{
 			}
 			unset($p);
 			$path = $this->ovrRoutes($path);
-			$path[1] = str_replace('-','_',$path[1]);
+      if(!isset($path[1])) $path[1] = '';
+			$path[1] = strtr($path[1],'-','_');
 			if((!empty($path[1]))){
 				if($path[1] == "admin" && $this->admin_url !="admin"){
 					$newpath = realpath(SENECONTROLLER.$path[1]);
@@ -185,7 +192,7 @@ class SENE_Engine{
 						if(is_file($filename)){
 							require_once $filename;
 							$cname = basename($filename, ".php");
-							$cname = str_replace('-','_',$cname);
+							$cname = strtr($cname,'-','_');;
 							if (!class_exists($cname, false)) {
 								trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER.$path[2].'/'.$path[3].".php", E_USER_ERROR);
 								die();
@@ -199,14 +206,15 @@ class SENE_Engine{
 									$func = $path[4];
 								}
 							}
-							$func = str_replace('-','_',$func);
+							$func = strtr($func,'-','_');
 							if(method_exists($cname,$func)){
-								$reflection = new ReflectionMethod($cname, $func);
+								$reflection = new \ReflectionMethod($cname, $func);
 								if (!$reflection->isPublic()){
 									$this->notFound();
 								}
+
 								$args=array();
-								$num = $reflection->getNumberOfParameters();
+                $num = $reflection->getNumberOfParameters();
 								if($num>0){
 									for($j=0;$j<$num;$j++){
 										if(isset($path[(5+$j)])){
@@ -216,8 +224,9 @@ class SENE_Engine{
 										}
 									}
 								}
-                $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
+                unset($j,$num);
 								$reflection->invokeArgs($cname,$args);
+                unset($cname,$args);
 							}else{
 								$this->notFound($newpath);
 							}
@@ -227,7 +236,7 @@ class SENE_Engine{
 					}else	if(is_file($filename)){
 						require_once $filename;
 						$cname = basename($filename, ".php");
-						$cname = str_replace('-','_',$cname);
+						$cname = strtr($cname,'-','_');;
 						if (!class_exists($cname, false)) {
 							trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
 							die();
@@ -243,7 +252,7 @@ class SENE_Engine{
 						}
 						$func = str_replace('-','_',$func);
 						if(method_exists($cname,$func)){
-							$reflection = new ReflectionMethod($cname, $func);
+							$reflection = new \ReflectionMethod($cname, $func);
 							if (!$reflection->isPublic()){
 								$this->notFound();
 							}
@@ -258,7 +267,6 @@ class SENE_Engine{
 									}
 								}
 							}
-              $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 							$reflection->invokeArgs($cname,$args);
 						}else{
 							$this->notFound($newpath);
@@ -272,7 +280,7 @@ class SENE_Engine{
 					if(is_file($filename)){
 						include $filename;
 						$cname = basename($filename, ".php");
-						$cname = str_replace('-','_',$cname);
+						$cname = strtr($cname,'-','_');;
 						if(class_exists($cname)){
 							$cname = new $cname();
 							$func = "index";
@@ -285,7 +293,7 @@ class SENE_Engine{
 							}
 							$func = str_replace('-','_',$func);
 							if(method_exists($cname,$func)){
-								$reflection = new ReflectionMethod($cname, $func);
+								$reflection = new \ReflectionMethod($cname, $func);
 								if (!$reflection->isPublic()){
 									$this->notFound();
 								}
@@ -300,7 +308,6 @@ class SENE_Engine{
 										}
 									}
 								}
-                $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 								$reflection->invokeArgs($cname,$args);
 							}else{
 
@@ -371,7 +378,7 @@ class SENE_Engine{
 						if(is_file($filename)){
 							require_once $filename;
 							$cname = basename($filename, ".php");
-							$cname = str_replace('-','_',$cname);
+							$cname = strtr($cname,'-','_');;
 							if (!class_exists($cname, false)) {
 								trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
 								die();
@@ -387,7 +394,7 @@ class SENE_Engine{
 							}
 							$func = str_replace('-','_',$func);
 							if(method_exists($cname,$func)){
-								$reflection = new ReflectionMethod($cname, $func);
+								$reflection = new \ReflectionMethod($cname, $func);
 								if (!$reflection->isPublic()){
 									$this->notFound();
 								}
@@ -412,7 +419,7 @@ class SENE_Engine{
 					}else	if(is_file($filename)){
 						require_once $filename;
 						$cname = basename($filename, ".php");
-						$cname = str_replace('-','_',$cname);
+						$cname = strtr($cname,'-','_');;
 						if (!class_exists($cname, false)) {
 							trigger_error("Unable to load class: $cname. Please check classname on controller is exists in ".SENECONTROLLER." triggered ", E_USER_ERROR);
 							die();
@@ -428,7 +435,7 @@ class SENE_Engine{
 						}
 						$func = str_replace('-','_',$func);
 						if(method_exists($cname,$func)){
-							$reflection = new ReflectionMethod($cname, $func);
+							$reflection = new \ReflectionMethod($cname, $func);
 							if (!$reflection->isPublic()){
 								$this->notFound();
 							}
@@ -456,7 +463,7 @@ class SENE_Engine{
 					if(is_file($filename)){
 						include $filename;
 						$cname = basename($filename, ".php");
-						$cname = str_replace('-','_',$cname);
+						$cname = strtr($cname,'-','_');;
 						if(class_exists($cname)){
 							$cname = new $cname();
 							$func = "index";
@@ -469,7 +476,7 @@ class SENE_Engine{
 							}
 							$func = str_replace('-','_',$func);
 							if(method_exists($cname,$func)){
-								$reflection = new ReflectionMethod($cname, $func);
+								$reflection = new \ReflectionMethod($cname, $func);
 								if (!$reflection->isPublic()){
 									$this->notFound();
 								}
@@ -516,7 +523,7 @@ class SENE_Engine{
 				if(is_file($filename)){
 					include $filename;
 					$cname = basename($filename, ".php");
-					$cname = str_replace('-','_',$cname);
+					$cname = strtr($cname,'-','_');;
 					$cname = new $cname();
 					$func = "index";
 					if(isset($path[2])){
@@ -528,7 +535,7 @@ class SENE_Engine{
 					}
 
 					if(method_exists($cname,$func)){
-						$reflection = new ReflectionMethod($cname, $func);
+						$reflection = new \ReflectionMethod($cname, $func);
 						if (!$reflection->isPublic()){
 							$this->notFound();
 						}
@@ -570,7 +577,7 @@ class SENE_Engine{
 						if(is_file($filename)){
 							include $filename;
 							$cname = basename($filename, ".php");
-							$cname = str_replace('-','_',$cname);
+							$cname = strtr($cname,'-','_');;
 							$cname = new $cname();
 							$func = "index";
 							if(isset($path[2])){
@@ -582,7 +589,7 @@ class SENE_Engine{
 							}
 
 							if(method_exists($cname,$func)){
-								$reflection = new ReflectionMethod($cname, $func);
+								$reflection = new \ReflectionMethod($cname, $func);
 								if (!$reflection->isPublic()){
 									$found=0;
 									break;
@@ -673,7 +680,7 @@ class SENE_Engine{
 		$content = new Content();
 	}
 }
-function redir($url,$time=0,$type=1){
+function redir($url,$time=0,$type=0){
 	if($type=="1" || $type==1){
 		if($time){
 			echo '<meta http-equiv="refresh" content="'.$time.';URL=\''.$url.'\'" />';
@@ -690,176 +697,3 @@ function redir($url,$time=0,$type=1){
 		}
 	}
 }
-function base_url($url=""){
-	if(empty($url)) $url = "";
-	//var_dump($url);
-	//die();
-	return BASEURL.$url;
-}
-function base_url_admin($url=""){
-	return BASEURL.ADMIN_URL.'/'.$url;
-}
-function enkrip($str){
-	return base64_encode(base64_encode($str));
-}
-function dekrip($str){
-	return base64_decode(base64_decode($str));
-}
-function keyAdm(){
-	return sha1(date("*W*Y-m").SALTKEY);
-}
-function get_caller_info() {
-	$c = '';
-	$file = '';
-	$func = '';
-	$class = '';
-	$trace = debug_backtrace();
-	if (isset($trace[2])) {
-		$file = $trace[1]['file'];
-		$func = $trace[2]['function'];
-		if ((substr($func, 0, 7) == 'include') || (substr($func, 0, 7) == 'require')) {
-			$func = '';
-		}
-		} else if (isset($trace[1])) {
-		$file = $trace[1]['file'];
-		$func = '';
-	}
-	if (isset($trace[3]['class'])) {
-		$class = $trace[3]['class'];
-		$func = $trace[3]['function'];
-		$file = $trace[2]['file'];
-		} else if (isset($trace[2]['class'])) {
-		$class = $trace[2]['class'];
-		$func = $trace[2]['function'];
-		$file = $trace[1]['file'];
-	}
-	if ($file != '') $file = basename($file);
-	$c = $file . ": ";
-	$c .= ($class != '') ? ":" . $class . "->" : "";
-	$c .= ($func != '') ? $func . "(): " : "";
-	return($c);
-}
-function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_context){
-  if(isset($_SERVER['argv'])){
-    $backtraces = debug_backtrace();
-  	$bct = array();
-  	$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php','runner_controller.php');
-
-  	$ef = explode('/',str_replace('\\','/',$error_file));
-  	if(isset($ef[count($ef)-1])) $ef = $ef[count($ef)-1];
-  	if(in_array(strtolower($ef),$fls)){
-  		$error_file = '';
-  		$error_line = '';
-  	}
-  	$i=0;
-  	$bcts = array();
-  	foreach($backtraces as $bts){
-  		if(!isset($bts['file'])) continue;
-  		$bcts[] = $bts;
-  		$filename = explode('/',str_replace('\\','/',$bts['file']));
-  		if(isset($filename[count($filename)-1])) $filename = $filename[count($filename)-1];
-  		$bts['filename'] = $filename;
-  		if(!in_array(strtolower($filename),$fls)){
-  			if($i<=2 && (empty($error_file) || empty($error_line))){
-  				$error_file = $bts['file'];
-  				$error_line = $bts['line'];
-  			}
-  			$bct[]= $bts;
-  		}
-  		$i++;
-  	}
-  	if(empty($error_file) || empty($error_line)){
-  		$error_file = $bcts[0]['file'];
-  		$error_line = $bcts[0]['line'];
-  	}
-    $error_file = substr($error_file,strlen(SENEROOT));
-    print '================= ERROR ===================='.PHP_EOL;
-    print $error_file.''.PHP_EOL;
-  	print 'Line: '.$error_line.PHP_EOL;
-  	print 'Error: ['.$errno.'] '.$errstr.''.PHP_EOL;
-    $error_file = substr($error_file,strlen(SENEROOT));
-    print '--------------------------------------------'.PHP_EOL;
-  	print 'Backtrace: ---------------------------------'.PHP_EOL;
-  	$i=0;
-  	foreach($bct as $e){
-  		$i++;
-  		if($i<=-1) continue;
-  		if(!isset($e['file'])) continue;
-      $e['file'] = substr($e['file'],strlen(SENEROOT));
-  		print $i.'. File: '.$e['file'].PHP_EOL;
-  		print 'Line: '.$e['line'].PHP_EOL;
-  		if(isset($e['class'])){
-  			print 'Class: '.$e['class'].PHP_EOL;
-  			print 'Method: '.$e['function'].PHP_EOL;
-  		}else{
-  			print 'Function: '.$e['function'].PHP_EOL;
-  		}
-  	}
-    print '=========== Seme Framework v'.SENE_VERSION.' ============'.PHP_EOL;
-    die();
-  }else{
-  	header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-  	$backtraces = debug_backtrace();
-  	$bct = array();
-  	$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
-
-  	$ef = explode('/',str_replace('\\','/',$error_file));
-  	if(isset($ef[count($ef)-1])) $ef = $ef[count($ef)-1];
-  	if(in_array(strtolower($ef),$fls)){
-  		$error_file = '';
-  		$error_line = '';
-  	}
-  	$i=0;
-  	$bcts = array();
-  	foreach($backtraces as $bts){
-  		if(!isset($bts['file'])) continue;
-  		$bcts[] = $bts;
-  		$filename = explode('/',str_replace('\\','/',$bts['file']));
-  		if(isset($filename[count($filename)-1])) $filename = $filename[count($filename)-1];
-  		$bts['filename'] = $filename;
-  		if(!in_array(strtolower($filename),$fls)){
-  			if($i<=2 && (empty($error_file) || empty($error_line))){
-  				$error_file = $bts['file'];
-  				$error_line = $bts['line'];
-  			}
-  			$bct[]= $bts;
-  		}
-  		$i++;
-  	}
-  	if(empty($error_file) || empty($error_line)){
-  		$error_file = $bcts[0]['file'];
-  		$error_line = $bcts[0]['line'];
-  	}
-
-  	echo '<div style="padding: 10px; background-color: #ededed;">';
-  	echo '<h2 style="color: #ef0000;">Error</h2>';
-  	echo '<p>File: '.$error_file.'</p>';
-  	echo '<p>Line: '.$error_line.'</p>';
-  	echo "<p><b>Error:</b> [$errno] $errstr<br></p>";
-  	echo '</div>';
-  	echo '<div style="padding: 20px; border: 1px #dddddd solid; font-size: smaller;">';
-  	echo "<h3>Backtrace</h3>";
-  	echo '</div>';
-  	echo '<div style="padding: 20px; border: 1px #dddddd solid; font-size: smaller;">';
-  	$i=0;
-  	foreach($bct as $e){
-  		$i++;
-  		if($i<=-1) continue;
-  		if(!isset($e['file'])) continue;
-  		echo '<p><b>File</b>: '.$e['file'].'</p>';
-  		echo '<p><b>Line</b>: '.$e['line'].'</p>';
-  		if(isset($e['class'])){
-  			echo '<p><b>Class</b>: '.$e['class'].'</p>';
-  			echo '<p><b>Method</b>: '.$e['function'].'</p>';
-  		}else{
-  			echo '<p><b>Function</b>: '.$e['function'].'</p>';
-  		}
-
-  		echo '<hr>';
-  	}
-  	echo '</div>';
-    echo "<hr><p><small>Seme Framework v".SENE_VERSION." Error Handler</small></p>";
-    die();
-  }
-}
-if(!isset($_SERVER['SEME_ERR_BYPASS'])) set_error_handler("seme_error_handling");

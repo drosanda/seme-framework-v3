@@ -1,8 +1,10 @@
 <?php
-session_start();
-ini_set("error_reporting",E_ALL);
 $website_view_id = 1; // default
-$admin_secret_url = 'admin';
+$admin_secret_url = 'mastermind';
+$base_url = '';
+$directory = dirname(__FILE__);
+chdir("../../");
+
 
 $apps_dir='app';
 $assets_dir='assets';
@@ -121,15 +123,8 @@ if(!defined('SENEVIEW')) define('SENEVIEW',$view_dir);
 if(!defined('SENECONTROLLER')) define('SENECONTROLLER',$controller_dir);
 if(!defined('SENECORE')) define('SENECORE',$core_dir);
 
-if(!isset($_SERVER))$_SERVER = array();
-if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
-if(!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI'] = '/';
-if(!isset($_SERVER['DOCUMENT_ROOT'])) $_SERVER['DOCUMENT_ROOT'] = __DIR__;
-
-if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
 if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
 require_once(SENECFG."/config.php");
-$GLOBALS['sene_method'] = $sene_method;
 
 if(!file_exists(SENECFG."/controller.php")) die('unable to load config file : controller.php');
 require_once(SENECFG."/controller.php");
@@ -142,14 +137,9 @@ require_once(SENECFG."/database.php");
 
 if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
 require_once(SENECFG."/session.php");
-if(!defined('SALTKEY')) define('SALTKEY',$saltkey);
 
 if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
 require_once(SENECFG."/core.php");
-
-$GLOBALS['core_prefix'] = $core_prefix;
-$GLOBALS['core_controller'] = $core_controller;
-$GLOBALS['core_model'] = $core_model;
 
 if(!isset($default_controller,$notfound_controller)){
 	$default_controller="welcome";
@@ -170,8 +160,76 @@ if(!defined('WEBSITE_VIEW_ID')) define("WEBSITE_VIEW_ID",$website_view_id);
 
 $routing = array();
 
-require_once SENESYS."Functions.php";
+require_once "app/config/config.php";
+function base_url($url){
+  return $GLOBALS['base_url'].$url;
+}
+require_once "kero/sine/SENE_Controller.php";
+require_once "kero/sine/SENE_Model.php";
+require_once "app/core/JI_Controller.php";
+require_once "app/controller/api_mobile/apikey.php";
 
-require_once SENEKEROSINE."/Engine.php";
-$se = new \Kero\Sine\Engine($db);
-$se->Engine();
+class SENE_Runner {
+  var $root = '';
+  var $directory = '';
+  var $controller = 'app/controller/api_mobile';
+  var $directory_list = '';
+  public function __construct(){
+    $this->directory = dirname(__FILE__);
+    $this->directory_list = array();
+  }
+  private function __getClass($file){
+    $fp = fopen($file, 'r');
+    $class = $buffer = '';
+    $i = 0;
+    while (!$class) {
+      if (feof($fp)) break;
+      $buffer .= fread($fp, 512);
+      $tokens = token_get_all($buffer);
+      if (strpos($buffer, '{') === false) continue;
+        for (;$i<count($tokens);$i++) {
+          if ($tokens[$i][0] === T_CLASS) {
+            for ($j=$i+1;$j<count($tokens);$j++) {
+              if ($tokens[$j] === '{') {
+                $class = $tokens[$i+2][1];
+              }
+            }
+          }
+        }
+      }
+      return $class;
+    }
+    public function scan(){
+      chdir("../../");
+      $this->root = getcwd();
+      chdir($this->controller);
+      $g1 = glob("*");
+      foreach($g1 as $filename) {
+        if(is_dir($filename)){
+          $this->directory_list[] =  $filename;
+        }else{
+          echo "$filename size " . filesize($filename) . "<br />";
+          $kelas_path = pathinfo($filename);
+          $kelas_nama = $this->__getClass($filename);
+          echo 'Class: '.$kelas_nama.'<br />';
+          $methods = get_class_methods($kelas_nama);
+          $i=1;
+          foreach($methods as $method){
+            echo $i.'. Method: '.$method.'<br />';
+            $i++;
+          }
+        }
+
+      }
+    }
+    public function getMethods(){
+
+    }
+  }
+  echo '---<br />';
+  //$sr = new SENE_Runner();
+  //$sr->scan();
+  $methods = get_class_methods("Apikey");
+  echo '<pre>';
+  var_dump($methods);
+  echo '</pre>';
