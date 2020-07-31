@@ -7,25 +7,10 @@ class Home extends JI_Controller{
 	}
 	public function index(){
 		$data = $this->__init(); //method from app/core/ji_controller
-		
-		$this->load("b_user_model","bum");
-		
-		$di = [
-			"namax"=>'daeng'
-		];
-		//$this->bum->setDebug(1);
-		$res = $this->bum->set($di);
-		if($res){
-			echo 'Berhasil';
-		}else{
-			echo 'Gagal';
-		}
-		die();
-
 
 		//this config can be found on app/view/front/page/html/head.php
-		$this->setTitle('Tentang ke Pasien '.$this->site_suffix);
-		$this->setDescription('Silakan login terlebih dahulu sebelum ikut antrian di '.$this->site_name);
+		$this->setTitle($this->site_suffix);
+		$this->setDescription($this->site_description);
 		$this->setKeyword('dr alfred');
 
 		//sidebar left
