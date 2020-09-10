@@ -1,12 +1,9 @@
-# Seme Framework v3.1
-[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=master)](https://travis-ci.org/drosanda/seme-framework-v3)
+# Seme Framework v3.2.1
+[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.2.1)](https://travis-ci.org/drosanda/seme-framework-v3)
 
 Seme Framework PHP MVC Framework for creating small and medium app that needed for fast delivery. At first version of Seme Framework used for building API (Middle Ware) for another Application such as android, iOS, etc. And now as increasing of requirement, Seme Framework has expand the limit for creating Small and Medium App.
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 3.1.0
 ## Documentation
 
 Read the official [documentation of Seme Framework](https://seme.nyingspot.com/). Now only available in English.
@@ -19,9 +16,8 @@ This framework suitable for Programmer that only know about Manual way of code. 
  - Admin Friendly. Seme Framework has re-routing feature for admin page, without refactoring the MVC.
  - Theme Engine. Seme Framework has feature who can PUSH the content inside the layout view. Also support theming engine, if you want change the Style, you just clone the original one and modified safely.
 
-## Version 3.0
-On version 3.0 we have plan to do more with aliases in models and then we have more homework to rebalancing query builder (query helper) method.
-Adding library for using mailgun
+## Version 3.2.1
+The latest version of seme framework 3.x.x
 
 ## Basic Concept
 Seme Framework comes with basic routing and database that supported MySQL or MariaDB.
