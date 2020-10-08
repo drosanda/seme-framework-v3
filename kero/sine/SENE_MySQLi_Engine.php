@@ -181,7 +181,7 @@ class SENE_MySQLi_Engine{
 					return $dataz;
 				}else{
 					//$this->debug($sql);
-					trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+					//trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 					return $this->fieldvalue;
 				}
 			}
@@ -208,7 +208,7 @@ class SENE_MySQLi_Engine{
 				return $dataz;
 			}else{
 				//$this->debug($sql);
-				trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+				//trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 				return $this->fieldvalue;
 			}
 		}

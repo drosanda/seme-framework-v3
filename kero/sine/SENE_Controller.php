@@ -155,6 +155,9 @@ abstract class SENE_Controller{
 		echo $this->__themeRightContent;
 	}
 	public function getThemeLeftContent(){
+		//echo '<pre>';
+		//var_dump($this->__themeLeftContent);
+		//die('</pre>');
 		echo $this->__themeLeftContent;
 	}
 	public function getJsReady(){
@@ -651,12 +654,11 @@ class SENE_Input{
 	public function debug(){
 		return array("post_param"=>$_POST,"get_param"=>$_GET,"file_param"=>$_FILES);
 	}
-	public function request($var){
+	public function request($var,$d=0){
 		if(isset($_REQUEST[$var])){
 			return $_REQUEST[$var];
 		}else{
-			return 0;
+			return $d;
 		}
 	}
-
 }

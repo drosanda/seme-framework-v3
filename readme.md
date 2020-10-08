@@ -5,7 +5,7 @@ Seme Framework PHP MVC Framework for creating small and medium app that needed f
 
 ## Documentation
 
-Read the official [https://seme.framework.web.ids](https://seme.framework.web.ids/). Now only available in English.
+Read the official [https://seme.framework.web.id](https://seme.framework.web.id/). Now only available in English.
 
 ## Key Feature
 This framework suitable for Programmer that only know about Manual way of code. Not like this time, everything build up automatically through console. Seme Framework has taken different way of code, If you want build small app, why we need lots of library. Here is the key feature of Seme Framework:
@@ -147,7 +147,7 @@ Seme Framework allowing you to create template or layout that consist of separat
 ```
 
 ## More Guides
-Look for more guides https://seme.nyingspot.com/ (English) and https://www.nyingspot.com/author/seme_framework/ (Bahasa)
+Look for more guides https://seme.framework.web.id/ (English) and https://www.nyingspot.com/author/seme_framework/ (Bahasa)
 
 ## License
 Seme Framework licensed under MIT License 2.0
