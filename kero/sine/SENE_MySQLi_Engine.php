@@ -24,9 +24,6 @@ class SENE_MySQLi_Engine{
 	var $as_from=0;
 	var $join=0;
 	var $in_join=0;
-	var $join_multi=0;
-	var $in_join_multi=0;
-	var $query_last;
 
 	function __construct(){
 		$db = $GLOBALS['db'];
@@ -60,11 +57,8 @@ class SENE_MySQLi_Engine{
 		$this->cache_flush = 0;
 		$this->tis_limit = 0;
 		$in_join=0;
-		$in_join_mutli=0;
 		$this->as_from = array();
 		$this->join = array();
-		$this->join_multi = array();
-		$this->query_last = "";
 	}
   public static function getInstance(){
     return self::$_instance;
@@ -97,18 +91,29 @@ class SENE_MySQLi_Engine{
 		if($res){
 			return 1;
 		}else{
-			//$this->debug($sql);
-			//trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
+			$this->debug($sql);
+			trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 			return 0;
 		}
 	}
 	public function select_as($skey,$sval="",$escape=1){
-		if(is_array($skey)){
-			foreach($skey as $k=>$v){
-				$this->in_select .= "".$k." '".$v."', ";
+		if(empty($escape)){
+			if(is_array($skey)){
+				foreach($skey as $k=>$v){
+					$this->in_select .= "".$k." '".$v."', ";
+				}
+			}else{
+				$this->in_select .= "".$skey." AS '".$sval."', ";
 			}
 		}else{
-			$this->in_select .= "".$skey." AS '".$sval."', ";
+			if(is_array($skey)){
+				foreach($skey as $k=>$v){
+					$this->in_select .= "`".$k."` AS '".$v."', ";
+				}
+			}else{
+				$this->in_select .= "`".$skey."` AS '".$sval."', ";
+			}
+
 		}
 		return $this;
 	}
@@ -175,7 +180,7 @@ class SENE_MySQLi_Engine{
 					fclose($fp);
 					return $dataz;
 				}else{
-					$this->debug($sql);
+					//$this->debug($sql);
 					trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 					return $this->fieldvalue;
 				}
@@ -195,16 +200,14 @@ class SENE_MySQLi_Engine{
 						array_push($dataz,$data);
 					}
 				}else{
-					if(!is_bool($res)){
-						while($data=$res->fetch_object()){
-							$dataz[] = $data;
-						}
+					while($data=$res->fetch_object()){
+						$dataz[] = $data;
 					}
 				}
-				if(!is_bool($res)) $res->free();
+				$res->free();
 				return $dataz;
 			}else{
-				$this->debug($sql);
+				//$this->debug($sql);
 				trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql);
 				return $this->fieldvalue;
 			}
@@ -253,8 +256,8 @@ class SENE_MySQLi_Engine{
 		if(is_array($var)){
 
 		}else{
-			if(strtolower($var)=="null"){
-				return "NULL";
+			if(strtolower($var)=='null'){
+				return 'null';
 			}else{
 				return '"'.$this->__mysqli->real_escape_string($var).'"';
 			}
@@ -404,7 +407,7 @@ class SENE_MySQLi_Engine{
 			unset($v);
 			unset($k);
 			unset($val);
-		}else if(!empty($params) && !empty($params2)){
+		}else if(!empty($params) && strlen($params2)){
 			$val = $params2;
 			$v = $params2;
 
@@ -507,7 +510,7 @@ class SENE_MySQLi_Engine{
 					$val = $this->esc($val);
 					break;
 				default:
-					if($v=="IS NULL" || $v=="is null"){
+					if(strtolower($v) == "is null"){
 						$v = strtoupper($v);
 						$c = "";
 						$val = $v;
@@ -639,7 +642,7 @@ class SENE_MySQLi_Engine{
 			unset($v);
 			unset($k);
 			unset($val);
-		}else if(!empty($params) && !empty($params2)){
+		}else if(!empty($params) && strlen($params2)){
 			$val = $params2;
 			$v = $params2;
 
@@ -750,7 +753,7 @@ class SENE_MySQLi_Engine{
 					$val = ($val);
 					break;
 				default:
-					if($v=="IS NULL" || $v=="is null"){
+					if(strtolower($v) == "is null"){
 						$v = strtoupper($v);
 						$c = "";
 						$val = $v;
@@ -873,45 +876,26 @@ class SENE_MySQLi_Engine{
 		if(empty($this->in_select)) $this->in_select = "*";
 		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
 
-
-		if(count($this->join) > 0){
-			//print_r($this->as_from);
-			//die();
-			$table_alias = array_search($this->table,$this->as_from);
-			if($table_alias !== 0 ){
-				$sql .= " ".$table_alias." ";
-				foreach($this->join as $j){
-					$sql .= strtoupper($j->method)." JOIN ";
-					$table_on = $j->table_on;
-					if(empty($table_on)){
-						$table_on = $this->table;
-					}
-					$sql .= "`".$j->table."` ".$j->table_as." ON ".$j->table_as.".`".$j->table_key."` = ".$table_on.".`".$j->key_on."` ";
-				}
-			}else{
-				trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
-				die();
-			}
-
-		}else{
-			$table_alias = array_search($this->table,$this->as_from);
-			if($table_alias !== 0 ){
-				$sql .= " ".$table_alias." ";
-			}
-		}
-
-		if(count($this->join_multi) > 0){
-			$table_alias = array_search($this->table,$this->as_from);
-			if($table_alias !== 0 ){
-				foreach($this->join_multi as $j){
-					$sql .= strtoupper($j->method)." JOIN ";
-					$sql .= "`".$j->table."` ".$j->table_as." ON ".$j->on." ";
-				}
-			}else{
-				trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
-				die();
-			}
-		}
+		if (count($this->join) > 0) {
+      $table_alias = array_search($this->table, $this->as_from);
+      if ($table_alias !== 0) {
+          $sql .= ' '.$table_alias.' ';
+          foreach ($this->join as $j) {
+              $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
+              foreach($j->on as $o){
+                $sql .= '('.$o.') ';
+              }
+          }
+      } else {
+          trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+          die();
+      }
+    } else {
+        $table_alias = array_search($this->table, $this->as_from);
+        if ($table_alias !== 0) {
+            $sql .= ' '.$table_alias.' ';
+        }
+    }
 
 		if(!empty($this->in_where)){
 			$this->in_where = rtrim($this->in_where,"AND ");
@@ -955,10 +939,7 @@ class SENE_MySQLi_Engine{
 		if(!empty($this->cache_flush)){
 			$cache_flush = $this->cache_flush;
 		}
-		if($is_debug){
-			http_response_code(500);
-			die($sql);
-		}
+		if($is_debug) die($sql);
 		$res = $this->query($sql,$cache_save,$cache_flush,$tipe);
 		$this->flushQuery();
 		return $res;
@@ -969,44 +950,26 @@ class SENE_MySQLi_Engine{
 		if(empty($this->in_select)) $this->in_select = "*";
 		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
 
-		if(count($this->join) > 0){
-			//print_r($this->as_from);
-			//die();
-			$table_alias = array_search($this->table,$this->as_from);
-			if($table_alias !== 0 ){
-				$sql .= " ".$table_alias." ";
-				foreach($this->join as $j){
-					$sql .= strtoupper($j->method)." JOIN ";
-					$table_on = $j->table_on;
-					if(empty($table_on)){
-						$table_on = $this->table;
-					}
-					$sql .= "`".$j->table."` ".$j->table_as." ON ".$j->table_as.".`".$j->table_key."` = ".$table_on.".`".$j->key_on."` ";
-				}
-			}else{
-				trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
-				die();
-			}
-
-		}else{
-			$table_alias = array_search($this->table,$this->as_from);
-			if($table_alias !== 0 ){
-				$sql .= " ".$table_alias." ";
-			}
-		}
-
-		if(count($this->join_multi) > 0){
-			$table_alias = array_search($this->table,$this->as_from);
-			if($table_alias !== 0 ){
-				foreach($this->join_multi as $j){
-					$sql .= strtoupper($j->method)." JOIN ";
-					$sql .= "`".$j->table."` ".$j->table_as." ON ".$j->on." ";
-				}
-			}else{
-				trigger_error('JOIN MULTI: Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
-				die();
-			}
-		}
+		if (count($this->join) > 0) {
+      $table_alias = array_search($this->table, $this->as_from);
+      if ($table_alias !== 0) {
+          $sql .= ' '.$table_alias.' ';
+          foreach ($this->join as $j) {
+              $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
+              foreach($j->on as $o){
+                $sql .= '('.$o.') ';
+              }
+          }
+      } else {
+          trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+          die();
+      }
+    } else {
+        $table_alias = array_search($this->table, $this->as_from);
+        if ($table_alias !== 0) {
+            $sql .= ' '.$table_alias.' ';
+        }
+    }
 
 		if(!empty($this->in_where)){
 			$this->in_where = rtrim($this->in_where,"AND ");
@@ -1016,6 +979,7 @@ class SENE_MySQLi_Engine{
     $sql = rtrim($sql,' AND');
     $sql = rtrim($sql,' OR');
     $sql = $sql.' ';
+
 
 		if(!empty($this->in_group)){
 			$this->in_group = rtrim($this->in_group,", ");
@@ -1040,10 +1004,7 @@ class SENE_MySQLi_Engine{
 		if(!empty($this->cache_flush)){
 			$cache_flush = $this->cache_flush;
 		}
-		if($is_debug){
-			http_response_code(500);
-			die($sql);
-		}
+		if($is_debug) die($sql);
 		$res = $this->query($sql,$cache_save,$cache_flush,$tipe);
 		$this->flushQuery();
 		if(isset($res[0])) return $res[0];
@@ -1063,8 +1024,6 @@ class SENE_MySQLi_Engine{
 		$this->as_from = array();
 		$this->join = array();
 		$this->in_join = 0;
-		$this->join_multi = array();
-		$this->in_join_multi = 0;
 		return $this;
 	}
 	public function query_multi($sql){
@@ -1077,15 +1036,17 @@ class SENE_MySQLi_Engine{
 		$this->insert_multi($table,$datas,$is_debug);
 	}
 	public function insert_multi($table,$datas=array(),$is_debug=0){
+		//$multi_array=0;
+
 		if(!is_array($datas)){
-			trigger_error("Must be array!");
+			trigger_error('Must be array!');
 			die();
 		}
-		$sql = "INSERT INTO `".$table."`"." (";
+		$sql = 'INSERT INTO '.$table.' (';
 
 		foreach($datas as $data){
 			if(!is_array($data)){
-				trigger_error("Must be array!");
+				trigger_error('Must be array!');
 				die();
 			}
 			foreach($data as $key=>$val){
@@ -1098,8 +1059,8 @@ class SENE_MySQLi_Engine{
 
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
-				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+				if(strtolower($val)=='now()' || strtolower($val)=='null'){
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
@@ -1110,10 +1071,7 @@ class SENE_MySQLi_Engine{
 		$sql = rtrim($sql,",(");
 		$sql .= ";";
 
-		if($is_debug){
-			http_response_code(500);
-			die($sql);
-		}
+		if($is_debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
 		return $res;
@@ -1122,14 +1080,14 @@ class SENE_MySQLi_Engine{
 		//$multi_array=0;
 
 		if(!is_array($datas)){
-			trigger_error("Must be array!");
+			trigger_error('Must be array!');
 			die();
 		}
-		$sql = "INSERT IGNORE INTO `".$table."`"."(";
+		$sql = 'INSERT IGNORE INTO `'.$table.'`'.'(';
 
 		foreach($datas as $data){
 			if(!is_array($data)){
-				trigger_error("Must be array!");
+				trigger_error('Must be array!');
 				die();
 			}
 			foreach($data as $key=>$val){
@@ -1138,12 +1096,12 @@ class SENE_MySQLi_Engine{
 			break;
 		}
 		$sql = rtrim($sql,",");
-		$sql .= ") VALUES"."(";
+		$sql .= ") VALUES(";
 
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
-				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+				if(strtolower($val)=='now()' || strtolower($val)=='null'){
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
@@ -1154,10 +1112,7 @@ class SENE_MySQLi_Engine{
 		$sql = rtrim($sql,",(");
 		$sql .= ";";
 
-		if($is_debug){
-			http_response_code(500);
-			die($sql);
-		}
+		if($is_debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
 		return $res;
@@ -1166,13 +1121,13 @@ class SENE_MySQLi_Engine{
 		//$multi_array=0;
 		$this->last_id = 0;
 		if(!is_array($datas)){
-			trigger_error("Must be array!");
+			trigger_error('Must be array!');
 			die();
 		}
 		if($multi_array){
 			$this->insert_multi($table,$datas,$is_debug);
 		}else{
-			$sql = "INSERT INTO `".$table."`(";
+			$sql = 'INSERT INTO `'.$table.'`'.'(';
 
 			foreach($datas as $key=>$val){
 				$sql .="`".$key."`,";
@@ -1181,9 +1136,9 @@ class SENE_MySQLi_Engine{
 			$sql .= ") VALUES(";
 
 			foreach($datas as $key=>$val){
-				if($val=="NOW()" || $val=="now()"){
-					$sql .="".$val.",";
-				}else if(strtolower($val)=="null"){
+				if(strtolower($val) == 'now()'){
+					$sql .="".strtoupper($val).",";
+				}else if(strtolower($val)=='null'){
 					$sql .="NULL,";
 				}else{
 					$sql .="".$this->esc($val).",";
@@ -1192,10 +1147,7 @@ class SENE_MySQLi_Engine{
 			$sql = rtrim($sql,",");
 			$sql .= ");";
 
-			if($is_debug){
-				http_response_code(500);
-				die($sql);
-			}
+			if($is_debug) die($sql);
 			$res = $this->exec($sql);
 			$this->last_id = $this->lastId();
 			//var_dump($res);
@@ -1205,16 +1157,16 @@ class SENE_MySQLi_Engine{
 			return $res;
 		}
 	}
-	public function update($table,$datas=array(),$is_debug=0){
+	public function update($table,$datas=array(),$debug=0){
 		if(!is_array($datas)){
-			trigger_error("Must be array!");
+			trigger_error('Must be array!');
 			die();
 		}
 
 		$sql = "UPDATE `".$table."` SET ";
 
 		foreach($datas as $key=>$val){
-			if($val=="now()" || $val=="NOW()" || $val=="NULL" || $val=="null"){
+			if(strtoupper($val) == 'now()' || strtoupper($val) == 'null'){
 				$sql .="`".$key."` = ".$val.",";
 			}else{
 				$sql .="`".$key."` = ".$this->esc($val).",";
@@ -1233,12 +1185,7 @@ class SENE_MySQLi_Engine{
 			$b = $this->pagesize;
 			$sql .= " LIMIT ".$b;
 		}
-		
-		$this->query_last = $sql;
-		if($is_debug){
-			http_response_code(500);
-			die($sql);
-		}
+		if($debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
 		return $res;
@@ -1260,97 +1207,34 @@ class SENE_MySQLi_Engine{
 			$b = $this->pagesize;
 			$sql .= " LIMIT ".$b;
 		}
-		
-		$this->query_last = $sql;
-		if($is_debug){
-			http_response_code(500);
-			die($sql);
-		}
+		if($is_debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
 		return $res;
 	}
-	public function join($table,$as,$key,$table_on="",$on,$method="left"){
-			$join = new stdClass();
-			$join->table = $table;
-			$join->table_as = $as;
-			$join->table_key = $key;
 
-			$join->table_on = $table_on;
-			$join->key_on = $on;
+	public function join($table, $table_as, $table_key, $reff_as, $reff_key, $method='left')
+  {
+      $join = new stdClass();
+      $join->method = strtoupper(trim($method));
+      $join->table = '`'.$table.'` '.$table_as;
+      $join->on = array($table_as.'.`'.$table_key.'` = '.$reff_as.'.`'.$reff_key.'`');
+      $this->join[] = $join;
+      $this->in_join = $this->in_join+1;
+      $this->as_from[$table_as] = $table;
+      return $this;
+  }
+	public function join_as($tbl, $reff, $method='left')
+  {
+    $join = new stdClass();
+    $join->method = strtoupper(trim($method));
+    $join->table = $tbl;
+    $join->on = array($reff);
+    $this->join[] = $join;
+    $this->in_join = $this->in_join+1;
+    return $this;
+  }
 
-
-			$join->method = $method;
-
-			$this->as_from[$as] = $table;
-
-			$this->join[$this->in_join] = $join;
-			$this->in_join = $this->in_join+1;
-
-		return $this;
-	}
-	public function composite_create($key1,$operator,$key2,$method="AND",$bracket_open=0,$bracket_close=0){
-		$composite = new stdClass();
-		$composite->key1 = $key1;
-		$composite->key2 = $key2;
-		$composite->method = $method;
-		$composite->operator = $operator;
-		$composite->bracket_open = $bracket_open;
-		$composite->bracket_close = $bracket_close;
-		return $composite;
-	}
-	public function join_composite($table, $table_alias, $composites=array(), $method=""){
-		$method = strtoupper($method);
-		switch ($method) {
-			case 'INNER':
-				$method = 'INNER';
-				break;
-			case 'OUTER':
-				$method = 'OUTER';
-				break;
-			case 'LEFT':
-				$method = 'LEFT';
-				break;
-			case 'RIGHT':
-				$method = 'RIGHT';
-				break;
-			default:
-				$method="";
-				break;
-		}
-		//set table alias
-		$this->as_from[$table_alias] = $table;
-
-		//building new join class
-		$join_composite = new stdClass();
-		$join_composite->method = $method;
-		$join_composite->table = $table;
-		$join_composite->table_as = $table_alias;
-		$join_composite->on = '';
-
-		//building composite
-		if(!is_array($composites)){
-			trigger_error("JOIN_COMPOSITE the composites parameter must be array");
-		}
-		$composites_count = count($composites);
-		$composite_i = 0;
-		foreach($composites as $comp){
-			$composite_i++;
-			if(isset($comp->bracket_open)) if(!empty($comp->bracket_open)) $join_composite->on .= '(';
-			if(isset($comp->key1)) $join_composite->on .= $comp->key1;
-			if(isset($comp->operator)) $join_composite->on .= " $comp->operator ";
-			if(isset($comp->key2)) $join_composite->on .= $comp->key2;
-			if($composite_i < $composites_count){
-				if(isset($comp->method)) $join_composite->on .= " ".strtoupper($comp->method)." ";
-			}
-			if(isset($comp->bracket_close)) if(!empty($comp->bracket_close)) $join_composite->on .= ')';
-		}
-		;
-		//insert to global var
-		$this->join_multi[$this->in_join_multi] = $join_composite;
-		$this->in_join_multi = $this->in_join_multi+1;
-		return $this;
-	}
 	public function between($key,$val1,$val2,$is_not=0){
 		$this->in_where .= "(";
 		$this->in_where .= " ".$key."";
@@ -1375,13 +1259,13 @@ class SENE_MySQLi_Engine{
 		//$multi_array=0;
 		$this->last_id = 0;
 		if(!is_array($datas)){
-			trigger_error("Must be array!");
+			trigger_error('Must be array!');
 			die();
 		}
 		if($multi_array){
 			$this->replace_multi($table,$datas,$is_debug);
 		}else{
-			$sql = "REPLACE INTO `".$table."`(";
+			$sql = 'REPLACE INTO `'.$table.'`'.'(';
 
 			foreach($datas as $key=>$val){
 				$sql .="`".$key."`,";
@@ -1390,9 +1274,9 @@ class SENE_MySQLi_Engine{
 			$sql .= ") VALUES(";
 
 			foreach($datas as $key=>$val){
-				if($val=="NOW()" || $val=="now()"){
+				if($val=='now()' || $val=='now()'){
 					$sql .="".$val.",";
-				}else if(strtolower($val)=="null"){
+				}else if(strtolower($val)=='null'){
 					$sql .="NULL,";
 				}else{
 					$sql .="".$this->esc($val).",";
@@ -1401,10 +1285,7 @@ class SENE_MySQLi_Engine{
 			$sql = rtrim($sql,",");
 			$sql .= ");";
 
-			if($is_debug){
-				http_response_code(500);
-				die($sql);
-			}
+			if($is_debug) die($sql);
 			$res = $this->exec($sql);
 			$this->last_id = $this->lastId();
 			$this->flushQuery();
@@ -1415,19 +1296,19 @@ class SENE_MySQLi_Engine{
 		//$multi_array=0;
 
 		if(!is_array($datas)){
-			trigger_error("Must be array!");
+			trigger_error('Must be array!');
 			die();
 		}
-		$sql = "REPLACE INTO `".$table."` "."(";
+		$sql = 'REPLACE INTO `'.$table.'`'.' (';
 
 		foreach($datas as $data){
 			if(!is_array($data)){
-				trigger_error("Must be array!");
+				trigger_error('Must be array!');
 				die();
 			}
 			foreach($data as $key=>$val){
-				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+				if(strtolower($val)=='now()' || strtolower($val)=='null'){
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
@@ -1439,8 +1320,8 @@ class SENE_MySQLi_Engine{
 
 		foreach($datas as $ds){
 			foreach($ds as $key=>$val){
-				if(strtolower($val)=="now()" || strtolower($val)=="null"){
-					$sql .="".$val.",";
+				if(strtolower($val)=='now()' || strtolower($val)=='null'){
+					$sql .="".strtoupper($val).",";
 				}else{
 					$sql .="".$this->esc($val).",";
 				}
@@ -1451,10 +1332,7 @@ class SENE_MySQLi_Engine{
 		$sql = rtrim($sql,",(");
 		$sql .= ";";
 
-		if($is_debug){
-			http_response_code(500);
-			die($sql);
-		}
+		if($is_debug) die($sql);
 		$res = $this->exec($sql);
 		$this->flushQuery();
 		return $res;
@@ -1486,8 +1364,5 @@ class SENE_MySQLi_Engine{
 			trigger_error('Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
 		}
 		return 1;
-	}
-	public function getLastQuery(){
-		return $this->query_last;
 	}
 }
