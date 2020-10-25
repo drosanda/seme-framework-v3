@@ -1,12 +1,12 @@
 # Seme Framework v3.2.1
-[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.2.1)](https://travis-ci.org/drosanda/seme-framework-v3)
+[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.2.1)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=3.2.1)](https://coveralls.io/github/drosanda/seme-framework?branch=3.2.1) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/)
 
 Seme Framework PHP MVC Framework for creating small and medium app that needed for fast delivery. At first version of Seme Framework used for building API (Middle Ware) for another Application such as android, iOS, etc. And now as increasing of requirement, Seme Framework has expand the limit for creating Small and Medium App.
 
 
 ## Documentation
 
-Read the official [documentation of Seme Framework](https://seme.nyingspot.com/). Now only available in English.
+Read the official [documentation of Seme Framework](https://seme.framework.web.id/). Now only available in English.
 
 ## Key Feature
 This framework suitable for Programmer that only know about Manual way of code. Not like this time, everything build up automatically through console. Seme Framework has taken different way of code, If you want build small app, why we need lots of library. Here is the key feature of Seme Framework:
