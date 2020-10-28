@@ -108,7 +108,7 @@ if(!is_dir($view_dir)) die("Seme framework directory missing : ".pathinfo(__FILE
 if(!is_dir($controller_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
 if(!is_dir($core_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
 
-if(!defined('SENEROOT')) define('SENEROOT',str_replace("\\", "/", realpath("").'/'));
+if(!defined('SENEROOT')) define('SENEROOT',__DIR__.DIRECTORY_SEPARATOR);
 if(!defined('SENEAPP')) define('SENEAPP',str_replace("\\", "/",$apps_dir));
 if(!defined('SENEASSETS')) define('SENEASSETS',$assets_dir);
 if(!defined('SENESYS')) define('SENESYS',$ssys_dir);
