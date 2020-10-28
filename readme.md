@@ -1,5 +1,6 @@
 # Seme Framework v3.2.1
-[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=master)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=master)](https://coveralls.io/github/drosanda/seme-framework?branch=master) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/)
+[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=master)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=master)](https://coveralls.io/github/drosanda/seme-framework?branch=master) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/) [![Inline docs](http://inch-ci.org/github/drosanda/seme-framework-v3.svg?branch=master)](http://inch-ci.org/github/drosanda/seme-framework-v3)
+
 
 Seme Framework PHP MVC Framework for creating small and medium app that needed for fast delivery. At first version of Seme Framework used for building API (Middle Ware) for another Application such as android, iOS, etc. And now as increasing of requirement, Seme Framework has expand the limit for creating Small and Medium App.
 
