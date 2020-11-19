@@ -1208,6 +1208,14 @@ class SENE_MySQLi_Engine{
 			return $res;
 		}
 	}
+
+	/**
+	 * For updating a table.
+	 * *$this->db->esc() may required
+	 * @param  string $table table name
+	 * @param  array  $datas key value pair
+	 * @return object        this object
+	 */
 	public function update($table,$datas=array(),$is_debug=0){
 		if(!is_array($datas)){
 			trigger_error("Must be array!");
@@ -1236,7 +1244,53 @@ class SENE_MySQLi_Engine{
 			$b = $this->pagesize;
 			$sql .= " LIMIT ".$b;
 		}
-		
+
+		$this->query_last = $sql;
+		if($is_debug){
+			http_response_code(500);
+			die($sql);
+		}
+		$res = $this->exec($sql);
+		$this->flushQuery();
+		return $res;
+	}
+
+	/**
+	 * Same as update, but with no char escape. Useful for update from column to column in single table.
+	 * *$this->db->esc() may required
+	 * @param  string $table table name
+	 * @param  array  $datas key value pair
+	 * @return object        this object
+	 */
+	public function update_as($table,$datas=array(),$is_debug=0){
+		if(!is_array($datas)){
+			trigger_error("Must be array!");
+			die();
+		}
+
+		$sql = "UPDATE `".$table."` SET ";
+
+		foreach($datas as $key=>$val){
+			if($val=="now()" || $val=="NOW()" || $val=="NULL" || $val=="null"){
+				$sql .="".$key."=".$val.",";
+			}else{
+				$sql .="".$key."=".($val).",";
+			}
+		}
+
+		$sql = rtrim($sql,",");
+
+		if(!empty($this->in_where)){
+			$this->in_where = rtrim($this->in_where,"AND ");
+			$this->in_where = rtrim($this->in_where,"OR ");
+			$sql .= " WHERE ".$this->in_where;
+		}
+
+		if(!empty($this->pagesize) && ($this->tis_limit>0)){
+			$b = $this->pagesize;
+			$sql .= " LIMIT ".$b;
+		}
+
 		$this->query_last = $sql;
 		if($is_debug){
 			http_response_code(500);
@@ -1263,7 +1317,7 @@ class SENE_MySQLi_Engine{
 			$b = $this->pagesize;
 			$sql .= " LIMIT ".$b;
 		}
-		
+
 		$this->query_last = $sql;
 		if($is_debug){
 			http_response_code(500);
