@@ -1,6 +1,6 @@
 <?php
 session_start();
-ini_set('error_reporting',E_ALL);
+ini_set("error_reporting",E_ALL);
 $website_view_id = 1; // default
 $admin_secret_url = 'admin';
 
@@ -54,36 +54,36 @@ if (realpath($core_dir) !== FALSE){
 	$core_dir = realpath($core_dir).'/';
 }
 if(!is_dir($apps_dir)){
-	die('missing apps dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($assets_dir)){
-	die('missing assets dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing assets dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($ssys_dir)){
-	die('missing ssys dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing ssys dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($kerosine_dir)){
-	die('missing apps dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($library_dir)){
-	die('missing library dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing library dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($config_dir)){
-	die('missing config dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing config dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($cache_dir)){
-	die('missing cache dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing cache dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($model_dir)){
-	die('missing nodel dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing nodel dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }if(!is_dir($view_dir)){
-	die('missing view dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing view dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 	}
 if(!is_dir($controller_dir)){
-	die('missing controller dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing controller dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 if(!is_dir($core_dir)){
-	die('missing core dir: '.pathinfo(__FILE__, PATHINFO_BASENAME));
+	die("missing core dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 }
 
 $apps_dir = rtrim($apps_dir, '/').'/';
@@ -97,19 +97,19 @@ $view_dir = rtrim($view_dir, '/').'/';
 $controller_dir = rtrim($controller_dir, '/').'/';
 $core_dir = rtrim($core_dir, '/').'/';
 
-if(!is_dir($apps_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($ssys_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($kerosine_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($library_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($cache_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($config_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($model_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($view_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($controller_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
-if(!is_dir($core_dir)) die('Seme framework directory missing : '.pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($apps_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($ssys_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($kerosine_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($library_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($cache_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($config_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($model_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($view_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($controller_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($core_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
 
-if(!defined('SENEROOT')) define('SENEROOT',__DIR__.DIRECTORY_SEPARATOR);
-if(!defined('SENEAPP')) define('SENEAPP',str_replace('\\', '/',$apps_dir));
+if(!defined('SENEROOT')) define('SENEROOT', __DIR__.DIRECTORY_SEPARATOR);
+if(!defined('SENEAPP')) define('SENEAPP',str_replace("\\", "/",$apps_dir));
 if(!defined('SENEASSETS')) define('SENEASSETS',$assets_dir);
 if(!defined('SENESYS')) define('SENESYS',$ssys_dir);
 if(!defined('SENEKEROSINE')) define('SENEKEROSINE',$kerosine_dir);
@@ -121,57 +121,50 @@ if(!defined('SENEVIEW')) define('SENEVIEW',$view_dir);
 if(!defined('SENECONTROLLER')) define('SENECONTROLLER',$controller_dir);
 if(!defined('SENECORE')) define('SENECORE',$core_dir);
 
-if(!isset($_SERVER))$_SERVER = array();
 if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
-if(!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI'] = '/';
-if(!isset($_SERVER['DOCUMENT_ROOT'])) $_SERVER['DOCUMENT_ROOT'] = __DIR__;
-
-if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
-if(!file_exists(SENECFG.'/config.php')) die('unable to load config file : config.php');
-require_once(SENECFG.'/config.php');
+if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
+require_once(SENECFG."/config.php");
 $GLOBALS['sene_method'] = $sene_method;
 
-if(!file_exists(SENECFG.'/controller.php')) die('unable to load config file : controller.php');
-require_once(SENECFG.'/controller.php');
+if(!file_exists(SENECFG."/controller.php")) die('unable to load config file : controller.php');
+require_once(SENECFG."/controller.php");
 
-if(!file_exists(SENECFG.'/timezone.php')) die('unable to load config file : timezone.php');
-require_once(SENECFG.'/timezone.php');
+if(!file_exists(SENECFG."/timezone.php")) die('unable to load config file : timezone.php');
+require_once(SENECFG."/timezone.php");
 
-if(!file_exists(SENECFG.'/database.php')) die('unable to load config file : database.php');
-require_once(SENECFG.'/database.php');
+if(!file_exists(SENECFG."/database.php")) die('unable to load config file : database.php');
+require_once(SENECFG."/database.php");
 
-if(!file_exists(SENECFG.'/session.php')) die('unable to load config file : session.php');
-require_once(SENECFG.'/session.php');
+if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
+require_once(SENECFG."/session.php");
 if(!defined('SALTKEY')) define('SALTKEY',$saltkey);
 
-if(!file_exists(SENECFG.'/core.php')) die('unable to load config file : core.php');
-require_once(SENECFG.'/core.php');
+if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
+require_once(SENECFG."/core.php");
 
 $GLOBALS['core_prefix'] = $core_prefix;
 $GLOBALS['core_controller'] = $core_controller;
 $GLOBALS['core_model'] = $core_model;
 
 if(!isset($default_controller,$notfound_controller)){
-	$default_controller='welcome';
-	$notfound_controller='notfound';
+	$default_controller="welcome";
+	$notfound_controller="notfound";
 }
-if(!defined('DEFAULT_CONTROLLER')) define('DEFAULT_CONTROLLER',$default_controller);
-if(!defined('NOTFOUND_CONTROLLER')) define('NOTFOUND_CONTROLLER',$notfound_controller);
+if(!defined('DEFAULT_CONTROLLER')) define("DEFAULT_CONTROLLER",$default_controller);
+if(!defined('NOTFOUND_CONTROLLER')) define("NOTFOUND_CONTROLLER",$notfound_controller);
 
 if(!isset($site)){
 	die('please fill site url / base url in : '.SENECFG.'config.php. Example: https://www.example.com/');
 }
-if(!defined('BASEURL')) define('BASEURL',$site);
+if(!defined('BASEURL')) define("BASEURL",$site);
 if(!isset($admin_url)){
 	$admin_url=$admin_secret_url;
 }
-if(!defined('ADMIN_URL')) define('ADMIN_URL',$admin_url);
-if(!defined('WEBSITE_VIEW_ID')) define('WEBSITE_VIEW_ID',$website_view_id);
+if(!defined('ADMIN_URL')) define("ADMIN_URL",$admin_url);
+if(!defined('WEBSITE_VIEW_ID')) define("WEBSITE_VIEW_ID",$website_view_id);
 
 $routing = array();
 
-require_once SENESYS.'Functions.php';
-
-require_once SENEKEROSINE.'/Engine.php';
-$se = new \Kero\Sine\Engine($db);
-$se->Engine();
+require_once SENEKEROSINE."/SENE_Engine.php";
+$se = new SENE_Engine();
+$se->SENE_Engine();

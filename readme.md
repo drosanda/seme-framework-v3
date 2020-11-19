@@ -1,16 +1,12 @@
-# Seme Framework v3.2.1
-[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=master)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=master)](https://coveralls.io/github/drosanda/seme-framework?branch=master) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/) [![Inline docs](http://inch-ci.org/github/drosanda/seme-framework-v3.svg?branch=master)](http://inch-ci.org/github/drosanda/seme-framework-v3)
-
+# Seme Framework v3.2.2
+[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.2.1)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=3.2.1)](https://coveralls.io/github/drosanda/seme-framework?branch=3.2.1) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/)
 
 Seme Framework PHP MVC Framework for creating small and medium app that needed for fast delivery. At first version of Seme Framework used for building API (Middle Ware) for another Application such as android, iOS, etc. And now as increasing of requirement, Seme Framework has expand the limit for creating Small and Medium App.
 
 
-Download latest [Seme Framework v4](https://github.com/drosanda/seme-framework).
-
-
 ## Documentation
 
-Read the official documentation at [seme.framework.web.id](https://seme.framework.web.id). Now only available in English.
+Read the official [documentation of Seme Framework](https://seme.framework.web.id/). Now only available in English.
 
 ## Key Feature
 This framework suitable for Programmer that only know about Manual way of code. Not like this time, everything build up automatically through console. Seme Framework has taken different way of code, If you want build small app, why we need lots of library. Here is the key feature of Seme Framework:
@@ -20,17 +16,10 @@ This framework suitable for Programmer that only know about Manual way of code. 
  - Admin Friendly. Seme Framework has re-routing feature for admin page, without refactoring the MVC.
  - Theme Engine. Seme Framework has feature who can PUSH the content inside the layout view. Also support theming engine, if you want change the Style, you just clone the original one and modified safely.
 
-## Versions
-Here is list of versions available to Seme framework
-
-### Versions 3.3.0
-Add namespace for Core logic. Model class has been chaned to \Kero\Sine\Model.
-
-### 3.2.1
-On version 3.2.1 we have improved some codes and its docs.
-
-### 3.0.x - 3.1.x
-On version 3.0.x - 3.1.x we have plan to do more with aliases in models and then we have more homework to rebalancing query builder (query helper) method.
+## Version 3.2.2
+Here is the change log for version 3.2.2:
+- add update_as method
+- fix SENEROOT defining method for docker
 
 ## Basic Concept
 Seme Framework comes with basic routing and database that supported MySQL or MariaDB.
@@ -156,7 +145,7 @@ Seme Framework allowing you to create template or layout that consist of separat
 ```
 
 ## More Guides
-Look for more guides https://seme.framework.web.id/ (English) and https://www.nyingspot.com/author/seme_framework/ (Bahasa)
+Look for more guides https://seme.nyingspot.com/ (English) and https://www.nyingspot.com/author/seme_framework/ (Bahasa)
 
 ## License
 Seme Framework licensed under MIT License 2.0

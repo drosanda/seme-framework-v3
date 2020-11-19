@@ -2,22 +2,11 @@
 if(!class_exists("FDPF")){
 	require_once("fpdf/fpdf.php");
 }
-define('FPDF_FONTPATH',__DIR__.DIRECTORY_SEPARATOR.'fpdf/font/');
+define('FPDF_FONTPATH',SENELIB.'fpdf/font/');
 
 
 class Seme_FPDF extends FPDF {
 	var $UHC_widths;
-
-  var $NewPageGroup;   // variable indicating whether a new group was requested
-  var $PageGroups;     // variable containing the number of pages of the groups
-  var $CurrPageGroup;  // variable containing the alias of the current page group
-
-	//MC Table
-  var $widths;
-  var $aligns;
-
-  var $defObj;
-
 	public function __construct(){
 		//parent::__construct($orientation='P', $unit='mm', $size='A4');
 		parent::__construct();
@@ -31,147 +20,7 @@ class Seme_FPDF extends FPDF {
 		'd'=>583,'e'=>583,'f'=>375,'g'=>583,'h'=>583,'i'=>291,'j'=>333,'k'=>583,'l'=>291,'m'=>875,
 		'n'=>583,'o'=>583,'p'=>583,'q'=>583,'r'=>458,'s'=>541,'t'=>375,'u'=>583,'v'=>583,'w'=>833,
 		'x'=>625,'y'=>625,'z'=>500,'{'=>583,'|'=>583,'}'=>583,'~'=>750);
-    $this->defObj = array();
-    $this->aligns = array();
-    $this->widths = array();
 	}
-
-  // create a new page group; call this before calling AddPage()
-  function StartPageGroup() {
-		$this->NewPageGroup = true;
-	}
-
-
-    // current page in the group
-    function GroupPageNo() {
-			return $this->PageGroups[$this->CurrPageGroup];
-		}
-
-    // alias of the current page group -- will be replaced by the total number of pages in this group
-    function PageGroupAlias() {
-			return $this->CurrPageGroup;
-		}
-
-    function _beginpage($orientation, $format, $rotation) {
-			parent::_beginpage($orientation, $format, $rotation);
-			if($this->NewPageGroup) {
-				// start a new group
-				$n=0;
-				if(is_array($this->PageGroups)){
-					$n = sizeof($this->PageGroups)+1;
-				}
-				$alias = "{nb$n}";
-				$this->PageGroups[$alias] = 1;
-				$this->CurrPageGroup = $alias;
-				$this->NewPageGroup = false;
-			} elseif($this->CurrPageGroup){
-				$this->PageGroups[$this->CurrPageGroup]++;
-			}
-		}
-
-    function _putpages() {
-			$nb = $this->page;
-			if (!empty($this->PageGroups)) {
-				// do page number replacement
-				foreach ($this->PageGroups as $k => $v) {
-					for ($n = 1; $n <= $nb; $n++)
-					{
-						$this->pages[$n] = str_replace($k, $v, $this->pages[$n]);
-					}
-				}
-			}
-			parent::_putpages();
-		}
-
-
-    function SetWidths($w) {
-			//Set the array of column widths
-			$this->widths=$w;
-		}
-
-    function SetAligns($a) {
-			//Set the array of column alignments
-			$this->aligns=$a;
-		}
-
-    function Row($data) {
-			//Calculate the height of the row
-			$nb=0;
-			for($i=0;$i<count($data);$i++){
-				$nb=max($nb, $this->NbLines($this->widths[$i], $data[$i]));
-			}
-			$h=5*$nb;
-			//Issue a page break first if needed
-			$this->CheckPageBreak($h);
-			//Draw the cells of the row
-			for($i=0;$i<count($data);$i++) {
-				$w=$this->widths[$i];
-				$a=isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
-				//Save the current position
-				$x=$this->GetX();
-				$y=$this->GetY();
-				//Draw the border
-				$this->Rect($x, $y, $w, $h);
-				//Print the text
-				$this->MultiCell($w, 5, $data[$i], 0, $a);
-				//Put the position to the right of the cell
-				$this->SetXY($x+$w, $y);
-			}
-			//Go to the next line
-			$this->Ln($h);
-		}
-
-    function CheckPageBreak($h) {
-			//If the height h would cause an overflow, add a new page immediately
-			if($this->GetY()+$h>$this->PageBreakTrigger)
-			$this->AddPage($this->CurOrientation);
-		}
-
-
-    function NbLines($w, $txt) {
-			//Computes the number of lines a MultiCell of width w will take
-			$cw=&$this->CurrentFont['cw'];
-			if($w==0)
-			$w=$this->w-$this->rMargin-$this->x;
-			$wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
-			$s=str_replace("\r", '', $txt);
-			$nb=strlen($s);
-			if($nb>0 and $s[$nb-1]=="\n")
-			$nb--;
-			$sep=-1;
-			$i=0;
-			$j=0;
-			$l=0;
-			$nl=1;
-			while($i<$nb) {
-				$c=$s[$i];
-				if($c=="\n") {
-					$i++;
-					$sep=-1;
-					$j=$i;
-					$l=0;
-					$nl++;
-					continue;
-				}
-				if($c==' ') $sep=$i;
-				$l+=$cw[$c];
-				if($l>$wmax) {
-					if($sep==-1) {
-						if($i==$j)
-						$i++;
-						} else {
-						$i=$sep+1;
-					}
-					$sep=-1;
-					$j=$i;
-					$l=0;
-					$nl++;
-					} else {
-					$i++;
-				}
-			}
-			return $nl;
-		}
 
 	//begin korean text
 	function AddCIDFont($family, $style, $name, $cw, $CMap, $registry){
@@ -489,8 +338,7 @@ class Seme_FPDF extends FPDF {
 		$barChar['%'] = 'nnnwnwnwn';
 
 		$this->SetFont('Arial','',10);
-		//$this->Text($xpos, $ypos + $height + 4, $code);
-		//$this->Cell($xpos, $ypos + $height + 4,$code,0,"C");
+		$this->Text($xpos, $ypos + $height + 4, $code);
 		$this->SetFillColor(0);
 
 		$code = '*'.strtoupper($code).'*';
@@ -514,18 +362,4 @@ class Seme_FPDF extends FPDF {
 			$xpos += $gap;
 		}
 	}
-
-  public function Header(){
-
-  }
-  public function Content(){
-
-  }
-  public function Footer(){
-		$this->SetY(-15);
-		$this->SetFont('Helvetica','I',9);
-    $this->setTextColor(113,113,113);
-		$this->Line(10,$this->GetY(),210,$this->GetY());
-		$this->Cell(0,10,'Seme Framework '.SEME_VERSION.'',0,0,'L');
-  }
 }
