@@ -1211,10 +1211,9 @@ class SENE_MySQLi_Engine{
 
 	/**
 	 * For updating a table.
-	 * *$this->db->esc() may required
 	 * @param  string $table table name
 	 * @param  array  $datas key value pair
-	 * @return object        this object
+	 * @return boolean        this object
 	 */
 	public function update($table,$datas=array(),$is_debug=0){
 		if(!is_array($datas)){
@@ -1254,7 +1253,6 @@ class SENE_MySQLi_Engine{
 		$this->flushQuery();
 		return $res;
 	}
-
 	/**
 	 * Same as update, but with no char escape. Useful for update from column to column in single table.
 	 * *$this->db->esc() may required
@@ -1300,6 +1298,7 @@ class SENE_MySQLi_Engine{
 		$this->flushQuery();
 		return $res;
 	}
+
 	public function delete($table,$is_debug=0){
 		if(empty($table)){
 			trigger_error("Missing table name while deleting");
