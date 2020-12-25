@@ -1553,4 +1553,236 @@ class SENE_MySQLi_Engine{
 		}
 		return $this;
 	}
+
+
+	/**
+	 * Created Union Query table from query builder (last query)
+	 * @return boolean $flush 		0 not flush, 1 flush
+	 * @return string  Query
+	 */
+	public function union_create($flush=1){
+		if(!isset($this->union)) $this->union = new stdClass();
+		if(!isset($this->union->table)) $this->union->table = array();
+		if(!is_array($this->union->table)) $this->union->table = array();
+
+		$this->in_select = rtrim($this->in_select,", ");
+		if(empty($this->in_select)) $this->in_select = "*";
+		$sql = "SELECT ".$this->in_select." FROM `".$this->table."`";
+
+		if (count($this->join) > 0) {
+      $table_alias = array_search($this->table, $this->as_from);
+      if ($table_alias !== 0) {
+          $sql .= ' '.$table_alias.' ';
+          foreach ($this->join as $j) {
+              $sql .= strtoupper($j->method).' JOIN '.$j->table.' ON ';
+              foreach($j->on as $o){
+                $sql .= '('.$o.') ';
+              }
+          }
+      } else {
+          trigger_error('Please use alias for main table first, you can set alias using $this->db->setTableAlias("YOURALIAS") OR $this->db->from("tabelname","tablealias");');
+          die();
+      }
+    } else {
+        $table_alias = array_search($this->table, $this->as_from);
+        if ($table_alias !== 0) {
+            $sql .= ' '.$table_alias.' ';
+        }
+    }
+
+		if(!empty($this->in_where)){
+			$this->in_where = rtrim($this->in_where,"AND ");
+			$this->in_where = rtrim($this->in_where,"OR ");
+			$sql .= " WHERE ".$this->in_where;
+		}
+		if(!empty($flush)) $this->flushQuery();
+		$this->union->table[] = $sql;
+		return $this;
+	}
+
+	/**
+	 * Add select column for union method
+	 * @param  string $k 	Column name
+	 * @param  string $a 	Column Alias string
+	 * @return object    	this object
+	 */
+	public function union_select($k,$a=''){
+		if(!isset($this->union)) $this->union = new stdClass();
+		if(!isset($this->union->select)) $this->union->select = array();
+		if(!is_array($this->union->select)) $this->union->select = array();
+		if(strlen($a)==0){
+			$a = $k;
+		}
+		$this->union->select[$a] = $k;
+		return $this;
+	}
+
+	/**
+	 * Set alias table for union method
+	 * @param  string $a 	Alias string
+	 * @return object    	this object
+	 */
+	public function union_alias($a){
+		if(!isset($this->union)) $this->union = new stdClass();
+		if(!isset($this->union->from_as)) $this->union->from_as = '';
+		if(!is_string($this->union->from_as)) $this->union->from_as = '';
+		if(strlen($a)==0){
+			trigger_error('Empty union_alias parameter');
+			die();
+		}
+		$this->union->from_as = $a;
+		return $this;
+	}
+
+	/**
+	 * Set group by criteria for union method
+	 * @param  string $g 	Group by string
+	 * @return object    	this object
+	 */
+	public function union_group_by($g){
+		if(!isset($this->union)) $this->union = new stdClass();
+		if(!isset($this->union->group_by)) $this->union->group_by = '';
+		if(!is_string($this->union->group_by)) $this->union->group_by = '';
+		if(strlen($g)==0){
+			trigger_error('Empty union_grup_by parameter');
+			die();
+		}
+		$this->union->group_by = $g;
+		return $this;
+	}
+
+	/**
+	 * Add order by criteria for union method
+	 * @param  string $c 	sort by column name
+	 * @param  string $d 	sort direction
+	 * @return object    	this object
+	 */
+	public function union_order_by($c,$d){
+		if(!isset($this->union)) $this->union = new stdClass();
+		if(!isset($this->union->order_by)) $this->union->order_by = array();
+		if(!is_array($this->union->order_by)) $this->union->order_by = array();
+		if(strlen($c)==0){
+			trigger_error('Empty union_grup_by parameter');
+			die();
+		}
+		$d = strtoupper($d);
+		if(strlen($d)==0){
+			$d = 'ASC';
+		}
+		$this->union->order_by[] = $c.' '.$d;
+		return $this;
+	}
+
+	/**
+	 * Add limit query result for union
+	 * @param  string $a 	sort by column name
+	 * @param  string $b 	sort direction
+	 * @return object    	this object
+	 */
+	public function union_limit($a='',$b=''){
+		if(!isset($this->union)) $this->union = new stdClass();
+		if(!isset($this->union->order_by)) $this->union->order_by = array();
+		if(!is_array($this->union->order_by)) $this->union->order_by = array();
+
+		$a = (int) $a;
+		$b = (int) $b;
+		if($a<=0) $a = '';
+		if($b<=0) $b = '';
+		if(strlen($a) && strlen($b)){
+			$this->union->limit = $a.', '.$b;
+		}elseif(strlen($a) && strlen($b)==0){
+			$this->union->limit = $a;
+		}elseif(strlen($a)==0 && strlen($b)){
+			$this->union->limit = $b;
+		}else{
+			$this->union->limit = '';
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Get result Executed union query
+	 * @return object this object
+	 */
+	public function union_get($is_debug=0){
+		if(!isset($this->union->select)){
+			trigger_error('Missing union.select object on union_get');
+			die();
+		}
+		if(!isset($this->union->from_as)){
+			trigger_error('Missing union.from_as object on union_get');
+			die();
+		}
+		if(!isset($this->union->table)){
+			trigger_error('Missing union.table object on union_get');
+			die();
+		}
+		if(!is_array($this->union->table)){
+			trigger_error('Invalid type union.table object, is not an array');
+			die();
+		}
+		if(count($this->union->table)==0){
+			trigger_error('Empty union table');
+			die();
+		}
+		if(!is_string($this->union->group_by)){
+			trigger_error('Invalid type union.group_by object, is not a string');
+			die();
+		}
+		if(!is_array($this->union->order_by)){
+			trigger_error('Invalid type union.order_by object, is not an array');
+			die();
+		}
+		$sql = 'SELECT ';
+		if(count($this->union->select)){
+			foreach($this->union->select as $k=>$v){
+				if(!is_numeric($k) && $k != $v){
+					$sql .= ' '.$v.' AS '.$k.' ';
+				}else{
+					$sql .= ' '.$v.' ';
+				}
+			}
+		}else{
+			$sql .= ' * ';
+		}
+		$sql .= ' FROM ( ';
+		foreach($this->union->table as $k=>$v){
+			$sql .= $v.' UNION ';
+		}
+		$sql = chop($sql, ' UNION ');
+		$sql .= ' ) AS '.$this->union->from_as.' ';
+		if(strlen($this->union->group_by)){
+			$sql .= ' GROUP BY '.$this->union->group_by;
+		}
+		if(count($this->union->order_by)){
+			$sql .= ' ORDER BY ';
+			foreach($this->union->order_by as $k=>$v){
+				$sql .= ''.$v.', ';
+			}
+			$sql = rtrim($sql,', ');
+		}
+		if(strlen($this->union->limit)){
+			$sql .= ' LIMIT '.$this->union->limit;
+		}
+		if($is_debug){
+			die($sql);
+		}
+		return $this->query($sql);
+	}
+
+	/**
+	 * Reset union object to its default value
+	 * @return object this object
+	 */
+	public function union_flush(){
+		$this->union = new stdClass();
+		$this->union->select = array();
+		$this->union->from_as = 'u1';
+		$this->union->table = array();
+		$this->union->group_by = '';
+		$this->union->order_by = array();
+		$this->union->limit = '';
+		return $this;
+	}
 }
