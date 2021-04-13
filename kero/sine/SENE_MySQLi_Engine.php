@@ -28,10 +28,17 @@ class SENE_MySQLi_Engine{
 	var $in_join_multi=0;
 	var $query_last;
 	var $is_debug;
+	var $env;
 
 	function __construct(){
 		$db = $GLOBALS['db'];
     $port = ini_get('mysqli.default_port');
+		if(isset($db['port'])){
+			if(strlen($db['port'])>=2){
+				$port = $db['port'];
+			}
+		}
+
 		mysqli_report(MYSQLI_REPORT_STRICT);
     //$this->koneksi=mysqli_connect($db['host'],$db['user'],$db['pass'],$db['name']);
 
@@ -44,7 +51,35 @@ class SENE_MySQLi_Engine{
     if ($this->__mysqli->connect_errno) {
       trigger_error('Couldn\'t connect to database. Please, check your database configuration on '.SENECFG.'/database.php', E_USER_ERROR);
     }
-    $this->__mysqli->set_charset('utf8');
+		if(isset($db['charset'])){
+			if(strlen($db['charset'])<=2){
+				$db['charset'] = 'utf8';
+			}
+		}else{
+			$db['charset'] = 'utf8';
+		}
+		$this->__mysqli->set_charset($db['charset']);
+
+		if(!isset($db['environment'])){
+			$db['environment'] = 'development';
+
+		}
+		if(strtolower($db['environment']) != 'production'){
+			$this->env = 'development';
+		}else{
+			$this->env = 'production';
+		}
+
+		if(isset($db['dbcollate'])){
+			if(strlen($db['dbcollate'])<=2){
+				$db['dbcollate'] = '';
+			}
+		}else{
+			$db['dbcollate'] = '';
+		}
+		if(strlen($db['charset'])>2 && strlen($db['dbcollate'])>3){
+			$this->__mysqli->query('SET NAMES '.$db['charset'].' COLLATE '.$db['dbcollate'].'');
+		}
 
     self::$__instance = $this;
 
@@ -98,7 +133,7 @@ class SENE_MySQLi_Engine{
 		if($res){
 			return 1;
 		}else{
-			if($this->is_debug){
+			if($this->env !== 'production' || $this->is_debug){
 				trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql, E_USER_NOTICE);
 			}
 			return 0;
@@ -131,8 +166,7 @@ class SENE_MySQLi_Engine{
 			if(!empty($name)){
 				$cache=$name."-".md5($sql).".json";
 			}
-			//die(SENECACHE.'/'.$cache);
-			//var_dump($cache_enabled);
+
 			if(isset($GLOBALS['semeflush'])){
 				$flushcache = $GLOBALS['semeflush'];
 			}
@@ -140,12 +174,10 @@ class SENE_MySQLi_Engine{
 				$cache_enabled = $GLOBALS['semecache'];
 			}
 			if($flushcache){
-				//die("deleted");
 				if(file_exists(SENECACHE.'/'.$cache))
 				unlink(SENECACHE.'/'.$cache);
 			}
 			if(file_exists(SENECACHE.'/'.$cache)){
-				//die("wololo");
 				$fp = fopen(SENECACHE.'/'.$cache, "r");
 				$str = fread($fp,filesize(SENECACHE.'/'.$cache));
 				fclose($fp);
@@ -156,7 +188,6 @@ class SENE_MySQLi_Engine{
 				if($res){
 					$dataz=array();
 					if($type=="array"){
-					//die($type);
 						while($data=$res->fetch_array()){
 							array_push($dataz,$data);
 						}
@@ -177,9 +208,12 @@ class SENE_MySQLi_Engine{
 					fclose($fp);
 					return $dataz;
 				}else{
-					$this->debug($sql);
-					trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql,E_USER_NOTICE);
-					return $this->fieldvalue;
+					if($this->env !== 'production' || $this->is_debug){
+						$this->debug($sql);
+						trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql,E_USER_NOTICE);
+					}else{
+						return 0;
+					}
 				}
 			}
 		}else{
@@ -206,14 +240,17 @@ class SENE_MySQLi_Engine{
 				if(!is_bool($res)) $res->free();
 				return $dataz;
 			}else{
-				$this->debug($sql);
-				trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql,E_USER_NOTICE);
-				return $this->fieldvalue;
+				if($this->env !== 'production' || $this->is_debug){
+					$this->debug($sql);
+					trigger_error('Error: '.$this->__mysqli->error.' -- SQL: '.$sql,E_USER_NOTICE);
+				}else{
+					return 0;
+				}
 			}
 		}
 	}
 	public function select($sql="",$cache_enabled=0,$flushcache=0,$type="object"){
-		//
+
 		$exp1 = 0;
 		$exp2 = 0;
 		if(!is_array($sql)){
@@ -1535,16 +1572,24 @@ class SENE_MySQLi_Engine{
 		}
 		return $res;
 	}
-	public function setCharSet($char_set){
+
+	/**
+	 * Set Character set for database connection
+	 * - https://www.php.net/manual/en/mysqlinfo.concepts.charset.php
+	 * @param string $char_set  Proper name of character set. E.g. latin1, utf8, utf8mb4
+	 * @param string $dbcollate Proper name of database collation set. E.g. latin1_swedish_ci, utf8mb4_unicode_ci
+	 */
+	public function setCharSet($char_set,$dbcollate=''){
 		$res = $this->__mysqli->set_charset($char_set);
 		if(!$res){
 			trigger_error('Cant change charset from '.$this->__mysqli->character_set_name().' to '.$char_set.' to database.');
 		}
+		if(strlen($dbcollate)>3){
+			$this->__mysqli->query('SET NAMES '.$char_set.' COLLATE '.$dbcollate.'');
+		}
 		return 1;
 	}
-	public function getLastQuery(){
-		return $this->query_last;
-	}
+
 	public function setDebug($is_debug){
 		if(!empty($is_debug)){
 			$this->is_debug = 1;
@@ -1553,7 +1598,6 @@ class SENE_MySQLi_Engine{
 		}
 		return $this;
 	}
-
 
 	/**
 	 * Created Union Query table from query builder (last query)

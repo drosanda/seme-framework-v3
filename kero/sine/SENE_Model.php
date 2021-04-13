@@ -7,6 +7,7 @@ abstract class SENE_Model {
 		$db=$GLOBALS['db'];
 		$this->loadEngine($db);
 	}
+
 	private function loadEngine($e){
 		if($e=="mysql"){
 			require_once(SENEKEROSINE."/SENE_MySQL_Engine.php");
@@ -19,18 +20,16 @@ abstract class SENE_Model {
 			$this->db = new SENE_MySQLi_Engine();
 		}
 	}
+	
 	public function exec($sql){
-		// $this->field = $this->engine->getField();
 		return $this->db->exec($sql);
 	}
 
 	public function multiExec($sql){
-		// $this->field = $this->engine->getField();
 		$res = $this->db->multiExec($sql);
 	}
 
 	public function select($sql,$cache_engine=0,$flushcache=0,$tipe="object"){
-	//die($tipe);
 		return $this->db->select($sql,$cache_engine,$flushcache,$tipe);
 	}
 	public function lastId(){
