@@ -1,6 +1,6 @@
 <?php
 abstract class SENE_Model {
-	protected $db;
+	public $db;
 	public $field = array();
 
 	public function __construct(){

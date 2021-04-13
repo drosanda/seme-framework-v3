@@ -1,5 +1,52 @@
 <?php
-DEFINE('SENE_VERSION','3.1.3');
+define('SENE_VERSION','3.1.1');
+if(isset($GLOBALS['saltkey'])){
+	define('SALTKEY',$GLOBALS['saltkey']);
+}else{
+	define('SALTKEY','');
+}
+
+if(!isset($_SERVER))$_SERVER = array();
+if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
+if(!isset($_SERVER['REQUEST_URI'])) $_SERVER['REQUEST_URI'] = '/';
+if(!isset($_SERVER['DOCUMENT_ROOT'])) $_SERVER['DOCUMENT_ROOT'] = __DIR__;
+
+if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
+require_once(SENECFG."/config.php");
+
+if(!file_exists(SENECFG."/controller.php")) die('unable to load config file : controller.php');
+require_once(SENECFG."/controller.php");
+
+if(!file_exists(SENECFG."/timezone.php")) die('unable to load config file : timezone.php');
+require_once(SENECFG."/timezone.php");
+
+if(!file_exists(SENECFG."/database.php")) die('unable to load config file : database.php');
+require_once(SENECFG."/database.php");
+
+if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
+require_once(SENECFG."/session.php");
+
+if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
+require_once(SENECFG."/core.php");
+
+if(!isset($site)){
+	die('please fill site url / base url in : '.SENECFG.'config.php. Example: https://www.example.com/');
+}
+define("BASEURL",$site);
+if(!isset($admin_url)){
+	$admin_url=$admin_secret_url;
+}
+if(!defined('ADMIN_URL')){
+	define("ADMIN_URL",$admin_url);
+}
+define("WEBSITE_VIEW_ID",$website_view_id);
+
+if(!isset($default_controller,$notfound_controller)){
+	$default_controller="welcome";
+	$notfound_controller="notfound";
+}
+define("DEFAULT_CONTROLLER",$default_controller);
+define("NOTFOUND_CONTROLLER",$notfound_controller);
 
 class SENE_Engine{
   protected static $__instance;
@@ -14,9 +61,10 @@ class SENE_Engine{
 	public function __construct(){
 		require_once SENEKEROSINE."/SENE_Controller.php";
 		require_once SENEKEROSINE."/SENE_Model.php";
+
 		if(isset($GLOBALS['core_prefix'])) if(!empty($GLOBALS['core_prefix'])) $this->core_prefix = $GLOBALS['core_prefix'];
-		if($GLOBALS['core_controller']) if(!empty($GLOBALS['core_controller'])) $this->core_controller = $GLOBALS['core_controller'];
-		if($GLOBALS['core_model']) if(!empty($GLOBALS['core_model'])) $this->core_model = $GLOBALS['core_model'];
+		if(isset($GLOBALS['core_controller'])) if(!empty($GLOBALS['core_controller'])) $this->core_controller = $GLOBALS['core_controller'];
+		if(isset($GLOBALS['core_model'])) if(!empty($GLOBALS['core_model'])) $this->core_model = $GLOBALS['core_model'];
 
 		$this->admin_url=ADMIN_URL;
 		self::$__instance = $this;
@@ -30,8 +78,8 @@ class SENE_Engine{
 			$rs[$key] = $val;
 		}
 		$this->routes = $rs;
-
-		$sene_method = $GLOBALS['sene_method'];
+		$sene_method = 'PATH_INFO';
+		if(isset($GLOBALS['sene_method'])) $sene_method = $GLOBALS['sene_method'];
 		if(isset($_SERVER['argv'])){
 			if(count($_SERVER['argv'])>1){
 				$i=0;
@@ -50,7 +98,7 @@ class SENE_Engine{
   public static function getInstance(){
     return self::$_instance;
   }
-	public function SENE_Engine(){
+	public function run(){
 		$core_controller_file = SENECORE.$this->core_prefix.$this->core_controller.'.php';
 		$core_model_file = SENECORE.$this->core_prefix.$this->core_model.'.php';
 
@@ -135,14 +183,14 @@ class SENE_Engine{
 	}
 	private function newRouteFolder(){
 		$found=0;
-		$sene_method = $GLOBALS['sene_method'];
+		$sene_method = 'PATH_INFO';
+		if(isset($GLOBALS['sene_method'])) $sene_method = $GLOBALS['sene_method'];
 		if(isset($_SERVER[$sene_method])){
-			$path = $_SERVER[$sene_method];
-      $path = str_replace("//","/",$path);
-			$path = explode("/",str_replace("//","/",$path));
+			$path=$_SERVER[$sene_method];
+			$path=explode("/",$path);
 			$i=0;
 			foreach($path as $p){
-				if(strlen($p)>0){
+				if(!empty($p)){
 					$pos = strpos($p, '?');
 					if ($pos !== false) {
 						//echo "pos: ".$pos;
@@ -166,7 +214,6 @@ class SENE_Engine{
 				}else{
 					$this->globalHandlerCMSPage($path);
 				}
-
 				$newpath = realpath(SENECONTROLLER.$path[1]);
 
 				if(is_dir($newpath)){
@@ -216,7 +263,6 @@ class SENE_Engine{
 										}
 									}
 								}
-                $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 								$reflection->invokeArgs($cname,$args);
 							}else{
 								$this->notFound($newpath);
@@ -258,7 +304,6 @@ class SENE_Engine{
 									}
 								}
 							}
-              $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 							$reflection->invokeArgs($cname,$args);
 						}else{
 							$this->notFound($newpath);
@@ -300,7 +345,6 @@ class SENE_Engine{
 										}
 									}
 								}
-                $_SERVER['SEME_CONTROLLER_CLASS'] = $cname;
 								$reflection->invokeArgs($cname,$args);
 							}else{
 
@@ -692,8 +736,6 @@ function redir($url,$time=0,$type=1){
 }
 function base_url($url=""){
 	if(empty($url)) $url = "";
-	//var_dump($url);
-	//die();
 	return BASEURL.$url;
 }
 function base_url_admin($url=""){
@@ -741,9 +783,13 @@ function get_caller_info() {
 }
 function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_context){
   if(isset($_SERVER['argv'])){
+    echo '======='.PHP_EOL;
+    echo 'ERROR '.PHP_EOL;
+    echo '======='.PHP_EOL;
     $backtraces = debug_backtrace();
-  	$bct = array();
-  	$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php','runner_controller.php');
+		$bct = array();
+  	$fls = array();
+  	//$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
 
   	$ef = explode('/',str_replace('\\','/',$error_file));
   	if(isset($ef[count($ef)-1])) $ef = $ef[count($ef)-1];
@@ -772,36 +818,34 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
   		$error_file = $bcts[0]['file'];
   		$error_line = $bcts[0]['line'];
   	}
-    $error_file = substr($error_file,strlen(SENEROOT));
-    print '================= ERROR ===================='.PHP_EOL;
-    print $error_file.''.PHP_EOL;
-  	print 'Line: '.$error_line.PHP_EOL;
-  	print 'Error: ['.$errno.'] '.$errstr.''.PHP_EOL;
-    $error_file = substr($error_file,strlen(SENEROOT));
-    print '--------------------------------------------'.PHP_EOL;
-  	print 'Backtrace: ---------------------------------'.PHP_EOL;
+  	echo $error_file.PHP_EOL;
+  	echo $error_line.PHP_EOL;
+  	echo "Error: [$errno] $errstr".PHP_EOL;
+  	echo '-------'.PHP_EOL;
+  	echo "Backtrace".PHP_EOL;
   	$i=0;
   	foreach($bct as $e){
   		$i++;
   		if($i<=-1) continue;
   		if(!isset($e['file'])) continue;
-      $e['file'] = substr($e['file'],strlen(SENEROOT));
-  		print $i.'. File: '.$e['file'].PHP_EOL;
-  		print 'Line: '.$e['line'].PHP_EOL;
+  		echo 'File: '.$e['file'].PHP_EOL;
+  		echo 'Line: '.$e['line'].PHP_EOL;
   		if(isset($e['class'])){
-  			print 'Class: '.$e['class'].PHP_EOL;
-  			print 'Method: '.$e['function'].PHP_EOL;
+  			echo 'Class: '.$e['class'].PHP_EOL;
+  			echo 'Method: '.$e['function'].PHP_EOL;
   		}else{
-  			print 'Function: '.$e['function'].PHP_EOL;
+  			echo 'Function: '.$e['function'].PHP_EOL;
   		}
+
+  		echo '--'.PHP_EOL;
   	}
-    print '=========== Seme Framework v'.SENE_VERSION.' ============'.PHP_EOL;
-    die();
+  	echo '--SEME FRAMEWORK v'.SENE_VERSION.'--'.PHP_EOL;
   }else{
-  	header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
   	$backtraces = debug_backtrace();
-  	$bct = array();
-  	$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
+		$bct = array();
+  	$fls = array();
+  	//$fls = array('index.php','sene_controller.php','sene_model.php','sene_engine.php','sene_mysqli_engine.php');
 
   	$ef = explode('/',str_replace('\\','/',$error_file));
   	if(isset($ef[count($ef)-1])) $ef = $ef[count($ef)-1];
@@ -861,5 +905,6 @@ function seme_error_handling($errno, $errstr, $error_file,$error_line,$error_con
     echo "<hr><p><small>Seme Framework v".SENE_VERSION." Error Handler</small></p>";
     die();
   }
+
 }
-if(!isset($_SERVER['SEME_ERR_BYPASS'])) set_error_handler("seme_error_handling");
+set_error_handler("seme_error_handling");

@@ -1,5 +1,5 @@
-# Seme Framework v3.1.4
-[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.1.0)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=3.1.0)](https://coveralls.io/github/drosanda/seme-framework?branch=3.1.0) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/)
+# Seme Framework v3.1.5
+[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.1.5)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=3.1.5)](https://coveralls.io/github/drosanda/seme-framework?branch=3.1.5) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/)
 
 Seme Framework PHP MVC Framework for creating small and medium app that needed for fast delivery. At first version of Seme Framework used for building API (Middle Ware) for another Application such as android, iOS, etc. And now as increasing of requirement, Seme Framework has expand the limit for creating Small and Medium App.
 
@@ -14,6 +14,11 @@ This framework suitable for Programmer that only know about Manual way of code. 
  - Not Too serious. You can played with Seme Framework at your own logic. Its free and almost has no restriction to developing your solution.
  - Admin Friendly. Seme Framework has re-routing feature for admin page, without refactoring the MVC.
  - Theme Engine. Seme Framework has feature who can PUSH the content inside the layout view. Also support theming engine, if you want change the Style, you just clone the original one and modified safely.
+
+## Version 3.1.5
+ This is latest version of 3.1 branch. Here is the new feature:
+ - add SENE_MySQLi_Engine::update_as method
+ - Fix SENEROOT base directory defining method for docker support
 
 ## Version 3.1.4
 This is latest version of 3.1 branch. Here is the new feature:

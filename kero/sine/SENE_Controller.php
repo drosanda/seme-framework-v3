@@ -277,10 +277,17 @@ abstract class SENE_Controller{
 	public function setKeyword($keyword="lightweight,framework,php,api,generator"){
 		$this->keyword = $keyword;
 	}
-	public function setRobots($robots="INDEX,FOLLOW"){
-		if($robots != "INDEX,FOLLOW") $robots='NOINDEX,NOFOLLOW';
-		$this->robots = $robots;
-	}
+
+  /**
+   * Set robots properties for html meta head
+   * @param string $robots robots configuration (INDEX,FOLLOW|INDEX,NOFOLLOW)
+   */
+  protected function setRobots($robots)
+  {
+      $this->robots = $robots;
+      return $this;
+  }
+
 	public function setIcon($icon="favicon.png"){
 		$this->icon = $icon;
 	}
@@ -369,9 +376,16 @@ abstract class SENE_Controller{
 	public function getKeyword(){
 		return $this->keyword;
 	}
-	public function getRobots(){
-		return $this->robots;
-	}
+
+  /**
+   * Return string for robots.txt location
+   * @return string keyword
+   */
+  protected function getRobots()
+  {
+      return $this->robots;
+  }
+  
 	public function getIcon($icon="favicon.png"){
 		return $this->icon;
 	}
