@@ -1,5 +1,5 @@
-# Seme Framework v3.2.2
-[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.2.1)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=3.2.1)](https://coveralls.io/github/drosanda/seme-framework?branch=3.2.1) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/)
+# Seme Framework v3.2.4
+[![Build Status](https://travis-ci.org/drosanda/seme-framework-v3.svg?branch=3.2.4)](https://travis-ci.org/drosanda/seme-framework-v3)  [![Coverage Status](https://coveralls.io/repos/github/drosanda/seme-framework/badge.svg?branch=3.2.4)](https://coveralls.io/github/drosanda/seme-framework?branch=3.2.4) [![Website seme.framwork.web.id](https://img.shields.io/website-up-down-green-red/http/seme.framework.web.id)](https://seme.framework.web.id/)
 
 Seme Framework PHP MVC Framework for creating small and medium app that needed for fast delivery. At first version of Seme Framework used for building API (Middle Ware) for another Application such as android, iOS, etc. And now as increasing of requirement, Seme Framework has expand the limit for creating Small and Medium App.
 
@@ -16,10 +16,11 @@ This framework suitable for Programmer that only know about Manual way of code. 
  - Admin Friendly. Seme Framework has re-routing feature for admin page, without refactoring the MVC.
  - Theme Engine. Seme Framework has feature who can PUSH the content inside the layout view. Also support theming engine, if you want change the Style, you just clone the original one and modified safely.
 
-## Version 3.2.2
-Here is the change log for version 3.2.2:
-- add update_as method
-- fix SENEROOT defining method for docker
+## Version 3.2.4
+Here is the change log for version 3.2.4:
+- add charset configration
+- add database collation configration
+- add database config environment
 
 ## Basic Concept
 Seme Framework comes with basic routing and database that supported MySQL or MariaDB.
