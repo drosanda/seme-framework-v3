@@ -3,8 +3,8 @@
 // Butuh Framework PHPUnit
 use PHPUnit\Framework\TestCase;
 
-require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_MySQLi_Engine.php';
-require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Model.php';
+require_once SENEKEROSINE.'SENE_MySQLi_Engine.php';
+require_once SENEKEROSINE.'SENE_Model.php';
 
 class SENE_Model_Mock extends SENE_Model {
   public $db;
@@ -65,37 +65,5 @@ final class SENE_Model_Test extends TestCase
   {
     $tc = new SENE_Model_Mock();
     $this->assertEquals(0,$tc->db->__mysqli->errno);
-  }
-
-  /**
-   * @uses SENE_Model_Test
-   * @uses SENE_Model_Mock
-   * @covers SENE_Model
-   * @covers SENE_MySQLi_Engine
-   */
-  public function testEncrypt()
-  {
-    $tc = new SENE_Model_Mock();
-    $v  = 'test';
-    $ek = $tc->config->database->enckey;
-    $ev = $tc->db->esc($v);
-    $ex = 'AES_ENCRYPT('.$ev.',"'.$ek.'")';
-    $this->assertEquals($ex, $this->invokeMethod($tc, '__encrypt', array($v)));
-  }
-
-  /**
-   * @uses SENE_Model_Test
-   * @uses SENE_Model_Mock
-   * @covers SENE_Model
-   * @covers SENE_MySQLi_Engine
-   */
-  public function testDecrypt()
-  {
-    $tc = new SENE_Model_Mock();
-    $v  = 'test';
-    $ek = $tc->config->database->enckey;
-    $ev = $v;
-    $ex = 'AES_DECRYPT('.$ev.',"'.$ek.'")';
-    $this->assertEquals($ex, $this->invokeMethod($tc, '__decrypt', array($v)));
   }
 }

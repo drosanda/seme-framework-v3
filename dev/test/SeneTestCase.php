@@ -1,67 +1,5 @@
 <?php
-/**
- * SeneEngineTest is a known like a 'bootstrap' for another Framework
- * @codeCoverageIgnore
- */
-
-if (!defined('SEME_VERSION')) {
-  define('SEME_VERSION', '4.0.1');
-}
-if (!defined('SEMEROOT')) {
-  define('SEMEROOT', __DIR__.'/../..');
-}
-
-if (!defined('SENEVIEW')) {
-  define('SENEVIEW',SEMEROOT.'/app/view');
-}
-if (!defined('TEM_ERR')) {
-  define('TEM_ERR', 'Error');
-}
-
-/** global objects */
-$GLOBALS['SEMEDIR'] = new stdClass();
-
-/**
-* Register a directory
-* @param  string $directory directory name
-* @param  string $name      alias
-*/
-$regdir = function ($directory, $name, $constant='') {
-  $directory = SEMEROOT.'/'.$directory;
-  if (realpath($directory) !== false) {
-    $directory = realpath($directory).'/';
-  }
-  if (!is_dir($directory)) {
-    trigger_error('Missing '.$directory.'');
-  }
-  $directory = rtrim($directory, '/').'/';
-  if (!is_dir($directory)) {
-    trigger_error('Missing '.$directory.'');
-  }
-  $GLOBALS['SEMEDIR']->$name = $directory;
-  if (strlen($constant)>0) {
-    if (!defined(strtoupper($constant))) {
-      define(strtoupper($constant), $directory);
-    }
-  }
-};
-
-
-// directory register
-$regdir('app', 'app');
-$regdir('app/cache', 'app_cache', 'SENECACHE');
-$regdir('app/config', 'app_config');
-$regdir('app/controller', 'app_controller');
-$regdir('app/core', 'app_core');
-$regdir('app/model', 'app_model');
-$regdir('app/view', 'app_view');
-$regdir('kero', 'kero');
-$regdir('kero/lib', 'kero_lib');
-$regdir('kero/sine', 'kero_sine');
-$regdir('kero/bin', 'kero_bin');
-
-// remove function
-unset($regdir);
+session_start();
 
 //cli validation
 if (!isset($_SERVER)) {
@@ -80,132 +18,186 @@ if (!isset($_SERVER['HTTP_HOST'])) {
   $_SERVER['HTTP_HOST'] = 'localhost';
 }
 
-// find configuration files and loaded it
-$config_values = array();
-$config_file_found = 0;
-$config_file_array = array('development.php','staging.php','production.php');
-$semevar = array();
-$routes = array();
-foreach ($config_file_array as $cfa) {
-  if (file_exists($GLOBALS['SEMEDIR']->app_config.$cfa) && is_readable($GLOBALS['SEMEDIR']->app_config.$cfa)) {
-    $config_file_found++;
-    $config_values['file'] = $GLOBALS['SEMEDIR']->app_config.$cfa;
-    $config_values['environment'] = rtrim($cfa, '.php');
-    require_once($GLOBALS['SEMEDIR']->app_config.$cfa);
-  }
-}
-if (empty($config_file_found)) {
-  die('No settings file found in : '.$GLOBALS['SEMEDIR']->app_config);
-}
-
-$db = array();
-$db['host']  = 'localhost';
-$db['user']  = 'root';
-$db['pass']  = '';
-$db['name']  = 'seme_framework';
-$db['port'] = '3306';
-$db['charset'] = 'latin1';
-$db['engine'] = 'mysqli';
-$db['enckey'] = '';
-
-$core_prefix = '';
-$core_controller = '';
-$core_model = '';
-$controller_main = 'home';
-$controller_404 = 'notfound';
-$routes = array();
-$semevar = array();
-
-// apply configuration
-$config_values['baseurl'] = 'https://localhost/';
-$config_values['method'] = 'PATH_INFO';
-$config_values['baseurl_admin'] = 'admin';
-$config_values['cdn_url'] = '';
-$config_values['database'] = new stdClass();
-$config_values['saltkey'] = '';
-$config_values['core_prefix'] = $core_prefix;
-$config_values['core_controller'] = $core_controller;
-$config_values['core_model'] = $core_model;
-$config_values['controller_main'] = $controller_main;
-$config_values['controller_404'] = $controller_404;
-$config_values['timezone'] = 'Asia/Jakarta';
-$config_values['routes'] = array();
-$config_values['semevar'] = array();
-
-// DB config convert to object
-foreach ($db as $k=>$v) {
-  $config_values['database']->{$k} = $v;
-}
-foreach ($semevar as $k=>$v) {
-  $config_values['semevar']->{$k} = $v;
-}
-unset($db,$k,$v,$routes,$semevar,$controller_404,$controller_main);
-
-//convert to object
-$cv = new stdClass();
-foreach ($config_values as $k=>$v) {
-  $cv->$k = $v;
-}
-unset($config_values,$k,$v);
-
-//register config to globals
-$GLOBALS['SEMECFG'] = $cv;
-unset($cv,$semevar,$core_model,$admin_secret_url);
-
-
-/** global functions */
+/** globals vars */
+$website_view_id = 1; // default
+$admin_secret_url = 'admin';
+$app_dir='app';
+$assets_dir='assets';
+$cache_dir='app/cache';
+$ssys_dir='kero';
+$kerosine_dir='kero/sine';
+$library_dir='kero/lib';
+$config_dir='app/config';
+$model_dir='app/model';
+$view_dir='app/view';
+$controller_dir='app/controller';
+$core_dir='app/core';
 
 /**
- * Get relatives base url
- * @param  string $url addtional url
- * @return string      full base url
+ * SeneEngineTest is a known like a 'bootstrap' for another Framework
+ * @codeCoverageIgnore
  */
-function base_url($url='')
-{
-    return rtrim($GLOBALS['SEMECFG']->baseurl.$url,'/').'/';
+if (!defined('SENEROOT')) {
+  define('SENEROOT', realpath(__DIR__.'/../..'));
 }
-/**
- * Set admin secret base url
- * @param  string $url addtional url
- * @return string      full url
- */
-function base_url_admin($url='')
-{
-    return rtrim($GLOBALS['SEMECFG']->baseurl.$GLOBALS['SEMECFG']->baseurl_admin.'/'.$url,'/').'/';
+if (!defined('TEM_ERR')) {
+  define('TEM_ERR', 'Error');
+}
+if (defined('STDIN')){
+	chdir(__DIR__.'/../..');
 }
 
-/**
- * Redirect to target url
- * @param  string  $url  target full qualified url
- * @param  integer $time delay time
- * @param  integer $type type of redirection, 1> html, 0 http header
- */
-function redir($url, $time=0, $type=0)
-{
-    if ($type=="1" || $type==1) {
-        if ($time) {
-            echo '<meta http-equiv="refresh" content="'.$time.';URL=\''.$url.'\'" />';
-        } else {
-            echo '<meta http-equiv="refresh" content="1;URL=\''.$url.'\'" />';
-        }
-    } else {
-        if ($time>1) {
-            header('HTTP/1.1 301 Moved Permanently');
-            header("Refresh:".$time."; url=".$url);
-        } else {
-            header('HTTP/1.1 301 Moved Permanently');
-            header('Location: ' . $url);
-        }
-    }
+if (realpath($app_dir) !== FALSE){
+	$app_dir = realpath($app_dir).'/';
 }
+if (realpath($assets_dir) !== FALSE){
+	$assets_dir = realpath($assets_dir).'/';
+}
+if (realpath($ssys_dir) !== FALSE){
+	$ssys_dir = realpath($ssys_dir).'/';
+}
+if (realpath($kerosine_dir) !== FALSE){
+	$kerosine_dir = realpath($kerosine_dir).'/';
+}
+if (realpath($config_dir) !== FALSE){
+	$config_dir = realpath($config_dir).'/';
+}
+if (realpath($cache_dir) !== FALSE){
+	$cache_dir = realpath($cache_dir).'/';
+}
+if (realpath($library_dir) !== FALSE){
+	$library_dir = realpath($library_dir).'/';
+}
+if (realpath($model_dir) !== FALSE){
+	$model_dir = realpath($model_dir).'/';
+}
+if (realpath($view_dir) !== FALSE){
+	$view_dir = realpath($view_dir).'/';
+}
+if (realpath($controller_dir) !== FALSE){
+	$controller_dir = realpath($controller_dir).'/';
+}
+if (realpath($core_dir) !== FALSE){
+	$core_dir = realpath($core_dir).'/';
+}
+
+if(!is_dir($app_dir)){
+	die("missing app dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($assets_dir)){
+	die("missing assets dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($ssys_dir)){
+	die("missing ssys dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($kerosine_dir)){
+	die("missing apps dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($library_dir)){
+	die("missing library dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($config_dir)){
+	die("missing config dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($cache_dir)){
+	die("missing cache dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($model_dir)){
+	die("missing nodel dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($view_dir)){
+	die("missing view dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+	}
+if(!is_dir($controller_dir)){
+	die("missing controller dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+if(!is_dir($core_dir)){
+	die("missing core dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
+}
+
+$app_dir = rtrim($app_dir, '/').'/';
+$ssys_dir = rtrim($ssys_dir, '/').'/';
+$kerosine_dir = rtrim($kerosine_dir, '/').'/';
+$library_dir = rtrim($library_dir, '/').'/';
+$cache_dir = rtrim($cache_dir, '/').'/';
+$config_dir = rtrim($config_dir, '/').'/';
+$model_dir = rtrim($model_dir, '/').'/';
+$view_dir = rtrim($view_dir, '/').'/';
+$controller_dir = rtrim($controller_dir, '/').'/';
+$core_dir = rtrim($core_dir, '/').'/';
+
+if(!is_dir($app_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($ssys_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($kerosine_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($library_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($cache_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($config_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($model_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($view_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($controller_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+if(!is_dir($core_dir)) die("Seme framework directory missing : ".pathinfo(__FILE__, PATHINFO_BASENAME));
+
+if(!defined('SENEAPP')) define('SENEAPP',str_replace("\\", "/",$app_dir));
+if(!defined('SENEASSETS')) define('SENEASSETS',$assets_dir);
+if(!defined('SENESYS')) define('SENESYS',$ssys_dir);
+if(!defined('SENEKEROSINE')) define('SENEKEROSINE',$kerosine_dir);
+if(!defined('SENELIB')) define('SENELIB',$library_dir);
+if(!defined('SENECACHE')) define('SENECACHE',$cache_dir);
+if(!defined('SENECFG')) define('SENECFG',$config_dir);
+if(!defined('SENEMODEL')) define('SENEMODEL',$model_dir);
+if(!defined('SENEVIEW')) define('SENEVIEW',$view_dir);
+if(!defined('SENECONTROLLER')) define('SENECONTROLLER',$controller_dir);
+if(!defined('SENECORE')) define('SENECORE',$core_dir);
+
+if(!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'localhost';
+if(!file_exists(SENECFG."/config.php")) die('unable to load config file : config.php');
+require_once(SENECFG."/config.php");
+$GLOBALS['sene_method'] = $sene_method;
+
+if(!file_exists(SENECFG."/controller.php")) die('unable to load config file : controller.php');
+require_once(SENECFG."/controller.php");
+
+if(!file_exists(SENECFG."/timezone.php")) die('unable to load config file : timezone.php');
+require_once(SENECFG."/timezone.php");
+
+if(!file_exists(SENECFG."/database.php")) die('unable to load config file : database.php');
+require_once(SENECFG."/database.php");
+
+if(!file_exists(SENECFG."/session.php")) die('unable to load config file : session.php');
+require_once(SENECFG."/session.php");
+if(!defined('SALTKEY')) define('SALTKEY',$saltkey);
+
+if(!file_exists(SENECFG."/core.php")) die('unable to load config file : core.php');
+require_once(SENECFG."/core.php");
+
+$GLOBALS['core_prefix'] = $core_prefix;
+$GLOBALS['core_controller'] = $core_controller;
+$GLOBALS['core_model'] = $core_model;
+
+if(!isset($default_controller,$notfound_controller)){
+	$default_controller="welcome";
+	$notfound_controller="notfound";
+}
+if(!defined('DEFAULT_CONTROLLER')) define("DEFAULT_CONTROLLER",$default_controller);
+if(!defined('NOTFOUND_CONTROLLER')) define("NOTFOUND_CONTROLLER",$notfound_controller);
+
+if(!isset($site)){
+	die('please fill site url / base url in : '.SENECFG.'config.php. Example: https://www.example.com/');
+}
+if(!defined('BASEURL')) define("BASEURL",$site);
+if(!isset($admin_url)){
+	$admin_url=$admin_secret_url;
+}
+if(!defined('ADMIN_URL')) define("ADMIN_URL",$admin_url);
+if(!defined('WEBSITE_VIEW_ID')) define("WEBSITE_VIEW_ID",$website_view_id);
+
+$routing = array();
 
 /** require_once core files */
 //require_once $GLOBALS['SEMEDIR']->kero.'Functions.php';
 
 /** loads kero/sine modules */
-require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Engine.php';
-require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Input.php';
-
+require_once SENEKEROSINE.'SENE_Engine.php';
 
 use PHPUnit\Framework\TestCase;
 

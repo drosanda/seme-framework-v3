@@ -244,12 +244,30 @@ abstract class SENE_Controller{
 			$this->js_footer[] = '<script src="'.$stype.'.js"></script>';
 		}
 	}
-	public function setCanonical($l=""){
-		$this->canonical = $l;
-	}
-	public function getCanonical(){
-		return $this->canonical;
-	}
+
+  /**
+   * Set canonical URL
+   * @param  string   $l  canonical url
+   * @return object       this object
+   */
+  protected function setCanonical($l='')
+  {
+      $this->canonical = $l;
+      return $this;
+  }
+
+  /**
+   * get Canonical URL
+   * @return string canonical url
+   */
+  protected function getCanonical()
+  {
+    if(strlen($this->canonical)<4){
+      return rtrim(base_url('')."".$_SERVER['REQUEST_URI']."",'/').'/';
+    }
+    return rtrim($this->canonical,'/').'/';
+  }
+
 	public function setContentLanguage($l="en"){
 		$this->content_language = $l;
 	}
@@ -274,10 +292,17 @@ abstract class SENE_Controller{
 	public function setKeyword($keyword="lightweight,framework,php,api,generator"){
 		$this->keyword = $keyword;
 	}
-	public function setRobots($robots="INDEX,FOLLOW"){
-		if($robots != "INDEX,FOLLOW") $robots='NOINDEX,NOFOLLOW';
-		$this->robots = $robots;
-	}
+
+  /**
+   * Set robots properties for html meta head
+   * @param string $robots robots configuration (INDEX,FOLLOW|INDEX,NOFOLLOW)
+   */
+  protected function setRobots($robots)
+  {
+      $this->robots = $robots;
+      return $this;
+  }
+
 	public function setIcon($icon="favicon.png"){
 		$this->icon = $icon;
 	}
@@ -366,9 +391,16 @@ abstract class SENE_Controller{
 	public function getKeyword(){
 		return $this->keyword;
 	}
-	public function getRobots(){
-		return $this->robots;
-	}
+
+  /**
+   * Return string for robots.txt location
+   * @return string keyword
+   */
+  protected function getRobots()
+  {
+      return $this->robots;
+  }
+  
 	public function getIcon($icon="favicon.png"){
 		return $this->icon;
 	}

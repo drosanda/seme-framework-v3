@@ -1,7 +1,7 @@
 <?php
 class SENE_MySQLi_Engine{
 	protected static $__instance;
-	protected $__mysqli;
+	public $__mysqli;
 	protected $koneksi;
 	protected $fieldname = array();
 	protected $fieldvalue = array();

@@ -2,7 +2,8 @@
 use PHPUnit\Framework\TestCase;
 
 // require_once $GLOBALS['SEMEDIR']->app_core.'ji_controller.php';
-require_once $GLOBALS['SEMEDIR']->app_controller.'home.php';
+require_once SENECORE.'ji_controller.php';
+require_once SENECONTROLLER.'home.php';
 
 final class HomeTest extends SeneTestCase
 {

@@ -76,7 +76,8 @@ if(!is_dir($cache_dir)){
 }
 if(!is_dir($model_dir)){
 	die("missing nodel dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
-}if(!is_dir($view_dir)){
+}
+if(!is_dir($view_dir)){
 	die("missing view dir: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 	}
 if(!is_dir($controller_dir)){

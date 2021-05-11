@@ -3,8 +3,8 @@
 // Butuh Framework PHPUnit
 use PHPUnit\Framework\TestCase;
 
-require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_MySQLi_Engine.php';
-require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Model.php';
+require_once SENEKEROSINE.'SENE_MySQLi_Engine.php';
+require_once SENEKEROSINE.'SENE_Model.php';
 
 class SENE_MySQLi_Engine_Mock extends SENE_MySQLi_Engine {
   public $db;

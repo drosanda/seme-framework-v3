@@ -3,7 +3,7 @@
 // Butuh Framework PHPUnit
 use PHPUnit\Framework\TestCase;
 
-require_once $GLOBALS['SEMEDIR']->kero_sine.'SENE_Controller.php';
+require_once SENEKEROSINE.'SENE_Controller.php';
 
 class SENE_Controller_Mock extends SENE_Controller {
   public function __construct(){
@@ -163,6 +163,7 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::keyAdm
    */
   public function testSession()
   {
@@ -204,24 +205,11 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
    */
-  public function testContentType()
-  {
-    $tc = new SENE_Controller_Mock();
-    $ts = 'text/html; charset=utf-8';
-    $this->invokeMethod($tc, 'setContentType', array($ts));
-    $this->assertEquals($ts, $this->invokeMethod($tc, 'getContentType', array()));
-  }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
   public function testTheme()
   {
     $tc = new SENE_Controller_Mock();
     $ts = 'admin';
-    $dir = $GLOBALS['SEMEDIR']->app_view.'/'.$ts;
+    $dir = SENEVIEW.'/'.$ts;
     if(is_dir($dir)) rmdir($dir);
     mkdir($dir);
     $this->invokeMethod($tc, 'setTheme', array($ts));
@@ -233,6 +221,7 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
    */
   public function testCanonicalEmpty()
   {
@@ -276,6 +265,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalPlain()
   {
@@ -292,6 +283,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalBaseUrl()
   {
@@ -308,6 +301,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalBaseUrlAdmin()
   {
@@ -316,22 +311,6 @@ final class SENE_Controller_Test extends TestCase
     $td = '{{base_url_admin}}test4.css';
     $ts = base_url_admin().'test4.css';
     $this->expectOutputRegex('~\b'.$ts.'\b~');
-    $this->invokeMethod($tc, 'setadditional', array($td));
-    $this->invokeMethod($tc, 'getadditional', array());
-  }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
-  public function testGetAdditionalCdnUrl()
-  {
-    $tc = new SENE_Controller_Mock();
-
-    $td = '{{cdn_url}}test5.css';
-    $ts = $this->invokeMethod($tc, 'cdn_url', array()).'test5.css';
-    $this->expectOutputRegex('~'.$ts.'~');
     $this->invokeMethod($tc, 'setadditional', array($td));
     $this->invokeMethod($tc, 'getadditional', array());
   }
@@ -354,6 +333,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalBeforePlain()
   {
@@ -370,6 +351,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalBeforeBaseUrl()
   {
@@ -386,6 +369,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalBeforeBaseUrlAdmin()
   {
@@ -394,22 +379,6 @@ final class SENE_Controller_Test extends TestCase
     $td = '{{base_url_admin}}test4.css';
     $ts = base_url_admin().'test4.css';
     $this->expectOutputRegex('~\b'.$ts.'\b~');
-    $this->invokeMethod($tc, 'setadditionalbefore', array($td));
-    $this->invokeMethod($tc, 'getadditionalbefore', array());
-  }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
-  public function testGetAdditionalBeforeCdnUrl()
-  {
-    $tc = new SENE_Controller_Mock();
-
-    $td = '{{cdn_url}}test5.css';
-    $ts = $this->invokeMethod($tc, 'cdn_url', array()).'test5.css';
-    $this->expectOutputRegex('~'.$ts.'~');
     $this->invokeMethod($tc, 'setadditionalbefore', array($td));
     $this->invokeMethod($tc, 'getadditionalbefore', array());
   }
@@ -432,6 +401,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalAfterPlain()
   {
@@ -448,6 +419,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalAfterBaseUrl()
   {
@@ -464,6 +437,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetAdditionalAfterBaseUrlAdmin()
   {
@@ -472,22 +447,6 @@ final class SENE_Controller_Test extends TestCase
     $td = '{{base_url_admin}}test4.css';
     $ts = base_url_admin().'test4.css';
     $this->expectOutputRegex('~\b'.$ts.'\b~');
-    $this->invokeMethod($tc, 'setadditionalafter', array($td));
-    $this->invokeMethod($tc, 'getadditionalafter', array());
-  }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
-  public function testGetAdditionalAfterCdnUrl()
-  {
-    $tc = new SENE_Controller_Mock();
-
-    $td = '{{cdn_url}}test5.css';
-    $ts = $this->invokeMethod($tc, 'cdn_url', array()).'test5.css';
-    $this->expectOutputRegex('~'.$ts.'~');
     $this->invokeMethod($tc, 'setadditionalafter', array($td));
     $this->invokeMethod($tc, 'getadditionalafter', array());
   }
@@ -524,6 +483,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testPutJsFooterExternal()
   {
@@ -538,6 +499,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetJsFooter()
   {
@@ -553,6 +516,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetJsFooterWithExtension()
   {
@@ -568,6 +533,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetJsFooterBaseUrl()
   {
@@ -583,6 +550,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetJsFooterBaseUrlWithExtension()
   {
@@ -598,6 +567,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetJsFooterBaseUrlAdmin()
   {
@@ -613,6 +584,8 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Test
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
+   * @covers ::base_url
+   * @covers ::base_url_admin
    */
   public function testGetJsFooterBaseUrlAdminWithExtension()
   {
@@ -629,42 +602,12 @@ final class SENE_Controller_Test extends TestCase
    * @uses SENE_Controller_Mock
    * @covers SENE_Controller
    */
-  public function testGetJsFooterCdnUrl()
-  {
-    $tc = new SENE_Controller_Mock();
-    $td = '{{cdn_url}}test5';
-    $ts = '<script src="'.$this->invokeMethod($tc, 'cdn_url', array()).'test5.js"></script>';
-    $this->expectOutputRegex('~'.$ts.'~');
-    $this->invokeMethod($tc, 'putjsfooter', array($td));
-    $this->invokeMethod($tc, 'getjsfooter', array());
-  }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
-  public function testGetJsFooterCdnUrlWithExtension()
-  {
-    $tc = new SENE_Controller_Mock();
-    $td = '{{cdn_url}}test5a.js';
-    $ts = '<script src="'.$this->invokeMethod($tc, 'cdn_url', array()).'test5a.js"></script>';
-    $this->expectOutputRegex('~'.$ts.'~');
-    $this->invokeMethod($tc, 'putjsfooter', array($td));
-    $this->invokeMethod($tc, 'getjsfooter', array());
-  }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
   public function testThemeScript()
   {
     $tc = new SENE_Controller_Mock();
     $ts = 'admin';
-    $dir = $GLOBALS['SEMEDIR']->app_view.$ts;
-    $file = $dir.'/'.$tc->js_json;
+    $dir = SENEVIEW.$ts;
+    $file = $dir.'/script.json';
     $script = "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>";
     $json = array(
       $script,
@@ -766,89 +709,5 @@ final class SENE_Controller_Test extends TestCase
     $tc->__jsContent = $ts;
     $this->invokeMethod($tc, 'getJsContent', array());
     $this->expectOutputString($ts);
-  }
-
-  /**
-   * @uses SENE_Controller_Test
-   * @uses SENE_Controller_Mock
-   * @covers SENE_Controller
-   */
-  public function testCdnUrl()
-  {
-    $tc = new SENE_Controller_Mock();
-    $tc->config->environment = '';
-    $tc->config->cdn_url = 'https://seme-framework.b-cdn.net/';
-    $ts = '';
-    $td = base_url();
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar1.png';
-    $td = base_url($ts);
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
-
-    $tc->config->environment = 'development';
-    $ts = '';
-    $td = base_url();
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar2.png';
-    $td = base_url($ts);
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
-
-    $tc->config->environment = 'staging';
-    $ts = '';
-    $td = $tc->config->cdn_url;
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar3.png';
-    $td = $tc->config->cdn_url.$ts;
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
-
-    $tc->config->environment = 'production';
-    $ts = '';
-    $td = $tc->config->cdn_url;
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar4.png';
-    $td = $tc->config->cdn_url.$ts;
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
-
-
-    $tc->config->environment = '';
-    $tc->config->cdn_url = '123456';
-    $ts = '';
-    $td = base_url();
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar1a.png';
-    $td = base_url($ts);
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
-
-    $tc->config->environment = 'development';
-    $ts = '';
-    $td = base_url();
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar2a.png';
-    $td = base_url($ts);
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
-
-    $tc->config->environment = 'staging';
-    $ts = '';
-    $td = base_url();
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar3a.png';
-    $td = base_url($ts);
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
-
-    $tc->config->environment = 'production';
-    $ts = '';
-    $td = base_url();
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array()));
-
-    $ts = 'media/skin/avatar4a.png';
-    $td = base_url($ts);
-    $this->assertEquals($td, $this->invokeMethod($tc, 'cdn_url', array($ts)));
   }
 }
