@@ -1,0 +1,4 @@
+repo_token: 26f9439b-54bf-4127-beca-d366b92ea1e0
+
+coverage_clover: dev/logs/clover.xml
+json_path: dev/logs/coveralls-upload.json
