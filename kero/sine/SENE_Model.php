@@ -1,26 +1,17 @@
 <?php
 abstract class SENE_Model {
-	protected $db;
+	public $db;
 	public $field = array();
 
 	public function __construct(){
-		$db=$GLOBALS['db'];
-		$this->loadEngine($db);
+		$this->loadEngine();
 	}
 
-	private function loadEngine($e){
-		if($e=="mysql"){
-			require_once(SENEKEROSINE."/SENE_MySQL_Engine.php");
-			$this->db = new SENE_MySQLi_Engine();
-		}elseif($e=="pdo"){
-			require_once(SENEKEROSINE."/SENE_PDO_Engine.php");
-			$this->db = new SENE_MySQLi_Engine();
-		}else{
-			require_once(SENEKEROSINE."/SENE_MySQLi_Engine.php");
-			$this->db = new SENE_MySQLi_Engine();
-		}
+	private function loadEngine(){
+		require_once(SENEKEROSINE."/SENE_MySQLi_Engine.php");
+		$this->db = new SENE_MySQLi_Engine();
 	}
-	
+
 	public function exec($sql){
 		return $this->db->exec($sql);
 	}

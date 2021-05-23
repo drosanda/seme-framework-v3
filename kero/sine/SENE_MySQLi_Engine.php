@@ -1,5 +1,5 @@
 <?php
-class SENE_MySQLi_Engine{
+class SENE_MySQLi_Engine {
 	protected static $__instance;
 	public $__mysqli;
 	protected $koneksi;
@@ -40,7 +40,6 @@ class SENE_MySQLi_Engine{
 		}
 
 		mysqli_report(MYSQLI_REPORT_STRICT);
-    //$this->koneksi=mysqli_connect($db['host'],$db['user'],$db['pass'],$db['name']);
 
     $this->__mysqli = new mysqli();
 		try {
@@ -409,8 +408,13 @@ class SENE_MySQLi_Engine{
 						$val = $this->esc($val);
 						break;
 					default:
-						$c = '=';
-						$val = $this->esc($v);
+						if(strtoupper(trim($v)) == "IS NULL" || strtoupper(trim($v)) == "IS NOT NULL"){
+							$c = '';
+							$val = strtoupper(trim($v));
+						}else{
+							$c = '=';
+							$val = $this->esc($v);
+						}
 				}
 
 				if($bracket){
