@@ -978,15 +978,13 @@ class SENE_MySQLi_Engine{
 			$sql .= " ORDER BY ".$this->in_order;
 		}
 
-		if(empty($all)){
-			if($this->is_limit){
-				$sql .= " LIMIT ".$this->limit_a.", ".$this->limit_b;
+		if($this->is_limit){
+			$sql .= " LIMIT ".$this->limit_a.", ".$this->limit_b;
+		}else{
+			if($this->page<=1){
+				if($this->pagesize<=0) $sql .= " LIMIT ".$this->pagesize;
 			}else{
-				if($this->page<=1){
-					if($this->pagesize<=0) $sql .= " LIMIT ".$this->pagesize;
-				}else{
-					$sql .= " LIMIT ".$this->page.", ".$this->pagesize;
-				}
+				$sql .= " LIMIT ".$this->page.", ".$this->pagesize;
 			}
 		}
 
