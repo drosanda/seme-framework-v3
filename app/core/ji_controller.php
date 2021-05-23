@@ -234,7 +234,7 @@
 				default:
 					$hari = 'Minggu';
 			}
-			$utype == strtolower($utype);
+			$utype = strtolower($utype);
 			if($utype=="hari") return $hari;
 			if($utype=="jam") return date('H:i',$stt).' WIB';
 			if($utype=="bulan") return $bulan;
