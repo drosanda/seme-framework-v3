@@ -323,7 +323,6 @@ abstract class SENE_Controller{
 		if(is_array($val)){
 			foreach($val as $v){
 				$this->additionalBefore[] = $v;
-				$i++;
 			}
 		}elseif(is_string($val)){
 			$this->additionalBefore[] = $val;
@@ -334,7 +333,6 @@ abstract class SENE_Controller{
 		if(is_array($val)){
 			foreach($val as $v){
 				$this->additionalAfter[] = $v;
-				$i++;
 			}
 		}elseif(is_string($val)){
 			$this->additionalAfter[] = $val;
@@ -400,7 +398,7 @@ abstract class SENE_Controller{
   {
       return $this->robots;
   }
-  
+
 	public function getIcon($icon="favicon.png"){
 		return $this->icon;
 	}
@@ -462,11 +460,21 @@ abstract class SENE_Controller{
 			$this->view($this->theme.'/'.$comp.'/'.$el,$__forward);
 		}
 	}
+
+  /**
+   * Load the model or library from controller and instantiate object with same name in controller
+   * if model relatives to app/model
+   * if library relatives to kero/lib
+   * @param  string $item       location and name of view without .php suffix
+   * @param  string $malias     alias of instantiate object, default empty
+   * @param  string $type       kind of load ('model', 'lib', '')
+   * @return object             return this class
+   */
 	protected function load($item,$malias="",$type="model"){
 		if($type=="model"){
 			$mfile = SENEMODEL.$item.'.php';
 			$cname = basename($mfile,'.php');
-			if(empty($malias)) $malias = $cname;
+			if(empty($malias)) $malias = strtolower($item);
 			$malias = strtolower($malias);
 			if(file_exists($mfile)){
 				if(!class_exists($cname)){
@@ -475,11 +483,10 @@ abstract class SENE_Controller{
 				$this->{$malias} = new $cname();
 			}else{
 				trigger_error('could not find model '.$item.'  on '.$mfile);
-				//die();
 			}
 		}elseif($type=="lib"){
 			$mfile = SENELIB.$item.'.php';
-			if(empty($malias)) $malias = $cname;
+			if(empty($malias)) $malias = strtolower($item);
 			$malias = strtolower($malias);
 			if(file_exists($mfile)){
 				require_once $mfile;
@@ -491,7 +498,7 @@ abstract class SENE_Controller{
 			if(file_exists(SENELIB.$item.'.php')){
 				require_once SENELIB.$item.'.php';
 			}else{
-				trigger_error('could not find require_once library '.$item.' on '.$mfile);
+				trigger_error('could not find require_once library '.$item.'');
 			}
 		}
 	}
