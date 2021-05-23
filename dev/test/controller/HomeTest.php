@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
-// require_once $GLOBALS['SEMEDIR']->app_core.'ji_controller.php';
 require_once SENECORE.'ji_controller.php';
 require_once SENECONTROLLER.'home.php';
 
-final class HomeTest extends SeneTestCase
+final class HomeTest extends Home
 {
   public function __construct(){
     parent::__construct();
